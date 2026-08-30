@@ -18,3 +18,5 @@ rh_text_classify            destructive=false mode=none
 rh_text_extract             destructive=false mode=none
 rh_text_summarise           destructive=false mode=none
 rh_text_translate           destructive=false mode=none
+rh_weather_air              destructive=false mode=none
+rh_weather_forecast         destructive=false mode=none

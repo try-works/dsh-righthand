@@ -16,6 +16,7 @@
  * - secrets-tools:   rh_credential_describe/set/unset + rh_settings_get/set
  * - task-tools:      rh_task_create/list/next/update/delete over ctx.storageDomain
  * - text-tools:      rh_text_summarise/extract/classify/translate over ctx.llm
+ * - weather-tools:   rh_weather_forecast/air over Open-Meteo (keyless, SSRF-guarded)
  * - exec-tools:      rh_run / rh_run_bg over ctx.subprocess + ctx.jobs
  * - guard-tools:     tools/pre-execute policy (config.rules)
  * - skills:          the packaged dsh-righthand skill (ctx.skills)
@@ -30,6 +31,7 @@ import * as execTools from './exec-tools.ts'
 import * as guardTools from './guard-tools.ts'
 import * as taskTools from './task-tools.ts'
 import * as textTools from './text-tools.ts'
+import * as weatherTools from './weather-tools.ts'
 import * as righthandSkills from './skills.ts'
 import type { GuardRule } from './guard-tools.ts'
 
@@ -56,14 +58,17 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(execTools)
   ctx.plugin(taskTools)
   ctx.plugin(textTools)
+  ctx.plugin(weatherTools)
   ctx.plugin(guardTools, { rules: config.rules ?? [] })
   ctx.plugin(righthandSkills)
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, textTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'
 export type { GuardFacts } from './guard-tools.ts'
+export { isBlockedIP, guardedFetch, normalizeForecast, normalizeAir } from './weather-tools.ts'
+export type { WeatherConfig, ForecastOut, AirOut } from './weather-tools.ts'
 

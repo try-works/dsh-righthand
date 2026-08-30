@@ -27,6 +27,7 @@ dsh --profile <profile> --patch ./cordis.patch.yml
 | `rh_store_put` / `rh_store_get` / `rh_store_delete` / `rh_store_list` | store | `ctx.storageDomain` (domain KV) |
 | `rh_task_create` / `rh_task_list` / `rh_task_next` / `rh_task_update` / `rh_task_delete` | tasks | `ctx.storageDomain` (typed `righthand_tasks` domain; state machine open → done/failed) |
 | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | text | `ctx.llm` (one model call per verb) |
+| `rh_weather_forecast` / `rh_weather_air` | weather | Open-Meteo (keyless), every request through the SSRF-guarded fetcher |
 | `rh_credential_describe` / `rh_credential_set` / `rh_credential_unset` | secrets | `ctx.credentials` (values never echoed) |
 | `rh_settings_get` / `rh_settings_set` | secrets | `ctx.settings` (namespace `righthand`) |
 | `rh_run` | exec | `ctx.subprocess` (collect mode, bounded output) |
@@ -82,6 +83,7 @@ canonical example of the current DSH-native form (tool-to-tool via
 | Blueprint | What it builds |
 |---|---|
 | `blueprint/daily-digest` | Collect sources, summarize, send on a schedule — extractive locally, LLM synthesis as escalation |
+| `blueprint/data-adapter` | Wrap one keyless public API as a tool family: guarded fetch, normalize, one tool per query. Worked example ships in the plugin: `rh_weather_*` |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |
 | `blueprint/vision-worker` | Cloudflare Worker exposing kimi-k2.6 vision: route image requests for text-only models, return a versioned `VisionEnvelope` |

@@ -17,6 +17,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | settings | `rh_settings_get` / `rh_settings_set` | `ctx.settings` (namespace `righthand`) | Reading or patching righthand settings (`accountId`, `defaultZone`, `defaultScriptPrefix`). |
 | exec | `rh_run` / `rh_run_bg` | `ctx.subprocess` + `ctx.jobs` | Running one command (argv array, no shell interpretation). `rh_run` collects bounded output; `rh_run_bg` starts an owner-scoped background job and returns its id. |
 | text | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | `ctx.llm` (one model call per verb) | Language work: shorten, turn into JSON matching a schema, sort into your labels with confidence, or translate preserving formatting. |
+| weather | `rh_weather_forecast` / `rh_weather_air` | Open-Meteo (keyless) via the SSRF-guarded fetcher | Current conditions + 3-day min/max, or PM2.5/PM10/AQI, for a lat/lon. Keyless only — anything needing an API token is out of scope. |
 | guard | (policy, not a tool) | `ctx.tools` `tools/pre-execute` | Configured via plugin config `rules`; gates tools by name prefix with `allow` / `deny` / `ask` modes. |
 
 ## Store semantics
@@ -24,6 +25,12 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - One domain `righthand_store`: a `rows` table (string key → JSON value + timestamp) and a global write counter.
 - `rh_store_get` returns `{ found, key, value?, updatedAt? }` — `found: false` means the key is absent, not an error.
 - Writes are durable (backend flush before commit) and serialized on one write chain; values must be JSON-serializable.
+
+## Weather semantics
+
+- Keyless only: Open-Meteo, no token. Every request goes through `guardedFetch` — public destinations only (loopback/private/link-local/multicast refused), every redirect hop revalidated, size and time capped.
+- Results are normalized to a stable shape (the wire JSON is the provider's; callers see ours).
+- Output schemas reject `null` — absent pollutant values are omitted, not null.
 
 ## Text semantics
 
@@ -61,5 +68,5 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Service availability
 
-- **web profile**: all twenty tools register (`storageDomain` is provided by the web app rows).
+- **web profile**: all twenty-two tools register (`storageDomain` is provided by the web app rows).
 - **other profiles** (e.g. headless): the store and task families stay dormant; the other seven tools still register. The plugin never fails the boot.
