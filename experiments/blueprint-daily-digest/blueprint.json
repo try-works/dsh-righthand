@@ -1,0 +1,74 @@
+{
+  "name": "blueprint/daily-digest",
+  "kind": "blueprint",
+  "description": "Collect sources, summarize, and send on a schedule — extractive (term-frequency) locally, LLM synthesis (ask-ai) as escalation.",
+  "keywords": [
+    "digest",
+    "daily",
+    "summary",
+    "summarize",
+    "news",
+    "gather",
+    "schedule",
+    "cron",
+    "extractive",
+    "synthesize"
+  ],
+  "use_cases": [
+    "daily digest",
+    "summarize sources",
+    "schedule a report",
+    "collect + rank news"
+  ],
+  "ingredients": [
+    "righthand/web-search | righthand/web-fetch (gather)",
+    "righthand/ask-ai (synthesis tier) or extractive (local stand-in)",
+    "righthand/notify (send)",
+    "optional: righthand/scheduler (cloud cron / OS scheduler)"
+  ],
+  "recipe": "gather sources → summarize (DSH-native: ctx.llm synthesis; extractive ranks by term frequency as the local stand-in) → notify / store + MDX",
+  "result_kind": "worker (one-shot) | worker + cron (scheduled)",
+  "invoke_contract": {
+    "input": {
+      "sources": "string[]?",
+      "topN": "number?"
+    },
+    "output": {
+      "generated": "string",
+      "source_count": "object",
+      "summary": "{sentence,score,from}[]"
+    }
+  },
+  "config_variants": {
+    "schedule": "cron | manual",
+    "synthesis": "extractive | ask-ai",
+    "sources": "hn | news | both"
+  },
+  "cost_hint": "paid model + search (ask-ai tier); free (extractive + RSS)",
+  "pitfalls": [
+    "cap sources",
+    "dedupe before summarize",
+    "timezone on the cron",
+    "probe selector/markup before parsing (HN dropped titlelink)",
+    "extractive surfaces representative items but does NOT synthesize — say so",
+    "Reddit: JSON API is IP-blocked (403); use RSS (browser UA, Accept: application/rss+xml, spaced requests + 429/403 backoff)",
+    "Reddit RSS: decode entities before stripping tags; cut the 'submitted by … [comments]' boilerplate; filter AutoMod/featured comment-feed repeats",
+    "DSH-native form: tool-to-tool via ctx.tools.execute; synthesis via ctx.llm.stream + BlockAssembler; MDX deliverable via ctx.fs with presentCall locations + presentResult diff"
+  ],
+  "local_limits": "one-shot only (no schedule — OS cron is the scheduler, not part of the tool); extractive ranks but does NOT synthesize; title-only for most sources (no snippet enrichment)",
+  "cloud_limits": "ask-ai synthesis + web-search paid per token/query; cron adds cold start + account quotas; full-body enrichment via Browser Run per-fetch + ToS-gray. Measured (cloud): HN Algolia front_page works (10 items) but Google News RSS 503 from CF egress → news half empty; brittle HN HTML selector replaced with Algolia",
+  "related": [
+    "righthand/web-search",
+    "righthand/ask-ai",
+    "righthand/notify",
+    "righthand/scheduler"
+  ],
+  "template": {
+    "local_entry": "run.ts",
+    "local_test": "test.ts",
+    "cloud_entry": "cloud/index.js",
+    "cloud_test": "cloud/test.ts",
+    "learnings": "LEARNINGS.md",
+    "cloud_learnings": "cloud/LEARNINGS.md"
+  }
+}

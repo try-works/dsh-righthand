@@ -1,0 +1,18 @@
+{
+  "deployed": true,
+  "url": "https://rh-digest.ambiens.workers.dev",
+  "versionId": "2a371db8-d603-4ef5-bd74-f15b6432e627",
+  "digest": {
+    "sources": 10,
+    "hn": 10,
+    "news": 0
+  },
+  "top": [
+    "AI-Generated GitHub Copilot Autofix Allowed Compromise of Snowflake's Jira",
+    "GPT 5.6 Sol is the best vision model OpenAI ever released",
+    "Incident with Github.com",
+    "Ask HN: Alternatives to GitHub",
+    "Qwen3.8 27B scores 52 on Artificial Analysis"
+  ],
+  "finding": "HN Algolia works from CF egress (10 items); Google News RSS returns 503 from CF egress (confirms research-radar finding) → news half empty."
+}

@@ -14,8 +14,11 @@ tsconfig.tsbuildinfo
 pnpm-lock.yaml
 pnpm-workspace.yaml
 
-# Experiment blueprints + wrangler caches (contain live account ids — never commit)
-experiments/
+# Experiment blueprints (contain live account ids — never commit)
+experiments/*
+# ...except the daily-digest blueprint guidance kit (secret-scanned clean).
+!experiments/blueprint-daily-digest/
+experiments/blueprint-daily-digest/cloud/.wrangler/
 
 # Never commit secrets or the npm token file
 *.token.txt
