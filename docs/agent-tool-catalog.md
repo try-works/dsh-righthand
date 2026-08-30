@@ -105,3 +105,49 @@ would generate the whole set.
 5. `rh_events_*`, `rh_notify_*`, then the out-of-scope list as optional
    plugins.
 
+## Incorporation decisions (from mu-repo-analysis.md)
+
+The architecture read produced eleven lessons; these are the ones worth
+incorporating now, each mapped to a concrete righthand change, in order.
+Deliberately NOT incorporated below the fold.
+
+### Incorporate now
+
+1. **Permissions golden first** (Mu lesson 2). Record the answer before
+   changing the model: `tests/permissions.golden`, one line per `rh_*` tool
+   (`destructive`, `requires`, guard-relevant facts). Any guard refactor
+   that leaves the file unchanged is behaviour-preserving; any diff is the
+   list of doors that moved.
+2. **Guard rules gain `requires` + `destructive` + `limit`** (lessons 2, 9,
+   10). `requires: open|caller|account` (identity tiers), `destructive:
+   true` (irreversible effects — the prompt-injection surface), `limit: N`
+   (hard per-day count, checked before the mode). allow/deny/ask stays.
+3. **Scope = catalogue** (lesson 10). The visible catalogue and the
+   enforceable scope must be one mechanism: the SKILL.md and README tool
+   tables must state what a guard rule gates, and the golden must derive
+   from the same declaration — no second hand-kept list.
+4. **`rh_task_*` family** (lesson 4). Tasks domain over the store:
+   create/list/next/update/delete with a state machine; descriptions carry
+   the "always say something" rule — a failed run is delivered like an
+   answer.
+5. **`rh_text_*` family** (lesson 7). summarise/extract/classify/translate
+   over `ctx.llm`, reusing the digest summarizer's prompt discipline: roles
+   stay roles, caps are deliberate, per-call failure contained.
+6. **Settings hygiene** (lesson 11). Every settings key must have a
+   consumer or go; document price vs limit in the namespace (storage and
+   agent work are free; fetches cost).
+7. **Data-adapter blueprint with the SSRF checklist** (lesson 6). The
+   fetcher blueprint guidance must carry: block non-public destinations,
+   revalidate every redirect hop, cap size and time.
+
+### Deliberately not incorporated
+
+| Mu feature | Reason |
+|---|---|
+| Spec.Card renderers | the web GUI owns turn summaries; righthand outputs carry `fetchedAt` instead |
+| held-state judge (agent/gate) | guard `ask` is the local judge; a full inbound queue needs a product surface |
+| agents-as-accounts / inbox address space | a product, not a plugin — the DSH harness already is the agent host |
+| quota.json pricing machinery | single-owner harness; settings keys + guard limits cover it |
+| memory-as-history fix | already how the DSH agent loop works — only prompt-building tools inherit the rule |
+| internal/ layering test | Cordis + the harness enforce the equivalent; the tool-to-tool rule goes in guidance instead |
+
