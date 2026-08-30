@@ -83,9 +83,12 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/mcp-tool-surface` | Deterministic + AI-backed tools behind a stateless MCP surface with normalized LLM output |
 | `blueprint/session-watcher` | Poll DSH sessions, evaluate a condition (new publish / builder idle / cadence), message a target session |
 
-A longer analysis of the tool families worth adding next (built from the
-[micro.mu/tools](https://micro.mu/tools) catalogue and its permission-model
-commit) lives in [`docs/agent-tool-catalog.md`](docs/agent-tool-catalog.md).
+Analyses of the [micro.mu](https://github.com/micro/mu) project this plugin
+learns from: [`docs/agent-tool-catalog.md`](docs/agent-tool-catalog.md) (tool
+families worth adding, from the tools catalogue + permission commit) and
+[`docs/mu-repo-analysis.md`](docs/mu-repo-analysis.md) (architecture lessons
+from the whole repo — single-source specs, golden permissions, layering,
+held-state gates, SSRF guarding).
 
 ## Packaged skill
 
