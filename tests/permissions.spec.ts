@@ -20,11 +20,13 @@ import LocalCredentialProvider from '@deepseek-ai/dsh-credentials-local'
 import FileSettingsProvider from '@deepseek-ai/dsh-settings-file'
 import LocalJobRegistry from '@deepseek-ai/dsh-jobs-local'
 import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
+import LlmRuntime, { LlmAdapter } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { storeTools, secretsTools, execTools, taskTools, guardTools, guardFactsFor } from '../src/index.ts'
+import { storeTools, secretsTools, execTools, taskTools, textTools, guardTools, guardFactsFor } from '../src/index.ts'
 import type { GuardRule } from '../src/index.ts'
 
 const contexts: Context[] = []
@@ -33,6 +35,20 @@ afterEach(async () => {
 })
 
 const GOLDEN = join(dirname(fileURLToPath(import.meta.url)), 'permissions.golden')
+
+/** Stub LLM adapter for the text family's llm inject. */
+class StubAdapter extends LlmAdapter {
+  override stream(_options: GenerateOptions): AsyncIterable<StreamChunk> {
+    const text = '{"ok":true}'
+    const chunks: StreamChunk[] = [
+      { type: 'block-start', index: 0, blockType: 'text' },
+      { type: 'text-delta', index: 0, text },
+      { type: 'block-end', index: 0, block: { type: 'text', text } },
+      { type: 'finish', reason: { kind: 'stop' } },
+    ]
+    return (async function* () { for (const c of chunks) yield c })()
+  }
+}
 
 /** The canonical ruleset the golden derives against. Exercises every mode + the destructive flag. */
 const CANONICAL_RULES: GuardRule[] = [
@@ -63,10 +79,13 @@ async function boot(): Promise<Context> {
   await ctx.plugin(FileSettingsProvider, { path: join(tmp, 'settings.yaml'), watch: false })
   await ctx.plugin(LocalJobRegistry)
   await ctx.plugin(LocalSubprocessRuntime)
+  await ctx.plugin(LlmRuntime)
+  ctx.llm.registerAdapter(['rt-test'], new StubAdapter())
   await ctx.plugin(storeTools)
   await ctx.plugin(secretsTools)
   await ctx.plugin(execTools)
   await ctx.plugin(taskTools)
+  await ctx.plugin(textTools, { provider: 'rt-test', model: 'stub' })
   await ctx.plugin(guardTools, { rules: CANONICAL_RULES })
   return ctx
 }

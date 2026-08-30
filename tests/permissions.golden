@@ -14,3 +14,7 @@ rh_task_delete              destructive=false mode=none
 rh_task_list                destructive=false mode=none
 rh_task_next                destructive=false mode=none
 rh_task_update              destructive=false mode=none
+rh_text_classify            destructive=false mode=none
+rh_text_extract             destructive=false mode=none
+rh_text_summarise           destructive=false mode=none
+rh_text_translate           destructive=false mode=none

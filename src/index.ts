@@ -15,6 +15,7 @@
  * - store-tools:     rh_store_put/get/delete/list over ctx.storageDomain
  * - secrets-tools:   rh_credential_describe/set/unset + rh_settings_get/set
  * - task-tools:      rh_task_create/list/next/update/delete over ctx.storageDomain
+ * - text-tools:      rh_text_summarise/extract/classify/translate over ctx.llm
  * - exec-tools:      rh_run / rh_run_bg over ctx.subprocess + ctx.jobs
  * - guard-tools:     tools/pre-execute policy (config.rules)
  * - skills:          the packaged dsh-righthand skill (ctx.skills)
@@ -28,6 +29,7 @@ import * as secretsTools from './secrets-tools.ts'
 import * as execTools from './exec-tools.ts'
 import * as guardTools from './guard-tools.ts'
 import * as taskTools from './task-tools.ts'
+import * as textTools from './text-tools.ts'
 import * as righthandSkills from './skills.ts'
 import type { GuardRule } from './guard-tools.ts'
 
@@ -53,12 +55,13 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(secretsTools)
   ctx.plugin(execTools)
   ctx.plugin(taskTools)
+  ctx.plugin(textTools)
   ctx.plugin(guardTools, { rules: config.rules ?? [] })
   ctx.plugin(righthandSkills)
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'

@@ -3,6 +3,8 @@ import { Context } from '@deepseek-ai/cordis'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
 import SkillRegistry from '@deepseek-ai/dsh-skill'
+import LlmRuntime, { LlmAdapter } from '@deepseek-ai/dsh-llm'
+import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 import Storage from '@deepseek-ai/dsh-storage'
 import * as StorageJson from '@deepseek-ai/dsh-storage-json'
 import * as StorageDomain from '@deepseek-ai/dsh-storage-domain'
@@ -13,7 +15,27 @@ import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { storeTools, secretsTools, execTools, taskTools, guardTools, apply, inject, name } from '../src/index.ts'
+import { storeTools, secretsTools, execTools, taskTools, textTools, guardTools, apply, inject, name } from '../src/index.ts'
+
+/** Stub LLM adapter: answers per system-prompt marker, deterministically. */
+class StubAdapter extends LlmAdapter {
+  override stream(options: GenerateOptions): AsyncIterable<StreamChunk> {
+    const sys = options.system ?? ''
+    let text: string
+    if (sys.includes('You summarise text')) text = 'This is a short summary.'
+    else if (sys.includes('extract structured data')) text = '{"name":"Alice","age":30}'
+    else if (sys.includes('You classify text')) text = '{"label":"bug","confidence":0.9}'
+    else if (sys.includes('You translate text')) text = 'Hola mundo'
+    else text = '{"ok":true}'
+    const chunks: StreamChunk[] = [
+      { type: 'block-start', index: 0, blockType: 'text' },
+      { type: 'text-delta', index: 0, text },
+      { type: 'block-end', index: 0, block: { type: 'text', text } },
+      { type: 'finish', reason: { kind: 'stop' } },
+    ]
+    return (async function* () { for (const c of chunks) yield c })()
+  }
+}
 
 const contexts: Context[] = []
 afterEach(async () => {
@@ -27,6 +49,8 @@ async function boot(tmp: string) {
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime, { mode: 'native' })
   await ctx.plugin(SkillRegistry)
+  await ctx.plugin(LlmRuntime)
+  ctx.llm.registerAdapter(['rt-test'], new StubAdapter())
   await ctx.plugin(Storage)
   await ctx.plugin(StorageJson, { root: join(tmp, 'storage') })
   await ctx.plugin(StorageDomain, { backend: 'json' })
@@ -38,6 +62,7 @@ async function boot(tmp: string) {
   await ctx.plugin(secretsTools)
   await ctx.plugin(execTools)
   await ctx.plugin(taskTools)
+  await ctx.plugin(textTools, { provider: 'rt-test', model: 'stub' })
   await ctx.plugin(guardTools, { rules: [{ toolPrefix: 'rh_deny_', mode: 'deny' }] })
   return ctx
 }
@@ -52,6 +77,8 @@ async function bootCombined(tmp: string) {
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime, { mode: 'native' })
   await ctx.plugin(SkillRegistry)
+  await ctx.plugin(LlmRuntime)
+  ctx.llm.registerAdapter(['rt-test'], new StubAdapter())
   await ctx.plugin(Storage)
   await ctx.plugin(StorageJson, { root: join(tmp, 'storage') })
   await ctx.plugin(StorageDomain, { backend: 'json' })
@@ -165,6 +192,43 @@ describe('task-tools over ctx.storageDomain', () => {
     expect((del.value as any).existed).toBe(true)
     const del2 = await call(ctx, 'rh_task_delete', { id: idA })
     expect((del2.value as any).existed).toBe(false)
+  })
+})
+
+describe('text-tools over ctx.llm', () => {
+  it('summarise returns plain prose', async () => {
+    const ctx = await boot(await mkdtemp(join(tmpdir(), 'rh-text-sum-')))
+    const r = await call(ctx, 'rh_text_summarise', { text: 'A long article about widgets. ' + 'It goes on for a while. '.repeat(20) })
+    expect(r.isError).toBe(false)
+    expect((r.value as any).summary).toBe('This is a short summary.')
+  })
+
+  it('extract returns JSON matching the caller schema', async () => {
+    const ctx = await boot(await mkdtemp(join(tmpdir(), 'rh-text-ext-')))
+    const r = await call(ctx, 'rh_text_extract', {
+      text: 'Alice, age 30, works at Acme.',
+      schema: { type: 'object', properties: { name: { type: 'string' }, age: { type: 'number' } }, required: ['name', 'age'] },
+    })
+    expect(r.isError).toBe(false)
+    expect((r.value as any).extracted).toEqual({ name: 'Alice', age: 30 })
+  })
+
+  it('classify returns one of the given labels with confidence', async () => {
+    const ctx = await boot(await mkdtemp(join(tmpdir(), 'rh-text-cls-')))
+    const r = await call(ctx, 'rh_text_classify', {
+      text: 'the app crashes when I save',
+      labels: ['bug', 'feature request', 'question'],
+    })
+    expect(r.isError).toBe(false)
+    expect((r.value as any).label).toBe('bug')
+    expect((r.value as any).confidence).toBe(0.9)
+  })
+
+  it('translate preserves prose', async () => {
+    const ctx = await boot(await mkdtemp(join(tmpdir(), 'rh-text-tr-')))
+    const r = await call(ctx, 'rh_text_translate', { text: 'Hello world', language: 'Spanish' })
+    expect(r.isError).toBe(false)
+    expect((r.value as any).translation).toBe('Hola mundo')
   })
 })
 

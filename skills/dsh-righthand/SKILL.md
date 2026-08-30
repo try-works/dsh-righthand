@@ -16,6 +16,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | secrets | `rh_credential_describe` / `rh_credential_set` / `rh_credential_unset` | `ctx.credentials` | The task must check, store, or remove a credential reference (e.g. `CLOUDFLARE_API_TOKEN`). Values are written durably and **never echoed back**. |
 | settings | `rh_settings_get` / `rh_settings_set` | `ctx.settings` (namespace `righthand`) | Reading or patching righthand settings (`accountId`, `defaultZone`, `defaultScriptPrefix`). |
 | exec | `rh_run` / `rh_run_bg` | `ctx.subprocess` + `ctx.jobs` | Running one command (argv array, no shell interpretation). `rh_run` collects bounded output; `rh_run_bg` starts an owner-scoped background job and returns its id. |
+| text | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | `ctx.llm` (one model call per verb) | Language work: shorten, turn into JSON matching a schema, sort into your labels with confidence, or translate preserving formatting. |
 | guard | (policy, not a tool) | `ctx.tools` `tools/pre-execute` | Configured via plugin config `rules`; gates tools by name prefix with `allow` / `deny` / `ask` modes. |
 
 ## Store semantics
@@ -23,6 +24,13 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - One domain `righthand_store`: a `rows` table (string key → JSON value + timestamp) and a global write counter.
 - `rh_store_get` returns `{ found, key, value?, updatedAt? }` — `found: false` means the key is absent, not an error.
 - Writes are durable (backend flush before commit) and serialized on one write chain; values must be JSON-serializable.
+
+## Text semantics
+
+- One model call per verb; each call's failure is contained (the other tools are unaffected).
+- `rh_text_extract` takes a JSON Schema and the model returns one object conforming to it — parse failures surface as a clean error, not raw prose.
+- `rh_text_classify` returns a label verbatim from the given set plus a 0–1 confidence; a label outside the set is an error.
+- Provider/model come from plugin config (`provider`/`model`, default the harness default model).
 
 ## Task semantics
 
@@ -53,5 +61,5 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Service availability
 
-- **web profile**: all sixteen tools register (`storageDomain` is provided by the web app rows).
+- **web profile**: all twenty tools register (`storageDomain` is provided by the web app rows).
 - **other profiles** (e.g. headless): the store and task families stay dormant; the other seven tools still register. The plugin never fails the boot.
