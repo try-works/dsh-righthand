@@ -83,6 +83,10 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/mcp-tool-surface` | Deterministic + AI-backed tools behind a stateless MCP surface with normalized LLM output |
 | `blueprint/session-watcher` | Poll DSH sessions, evaluate a condition (new publish / builder idle / cadence), message a target session |
 
+A longer analysis of the tool families worth adding next (built from the
+[micro.mu/tools](https://micro.mu/tools) catalogue and its permission-model
+commit) lives in [`docs/agent-tool-catalog.md`](docs/agent-tool-catalog.md).
+
 ## Packaged skill
 
 The plugin ships the `dsh-righthand` skill
