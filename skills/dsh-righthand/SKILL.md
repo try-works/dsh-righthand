@@ -12,6 +12,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | Family | Tools | Backing service | Use when |
 |--------|-------|-----------------|----------|
 | store | `rh_store_put` / `rh_store_get` / `rh_store_delete` / `rh_store_list` | `ctx.storageDomain` (domain KV) | The task needs durable state across turns: a catalog, counter, cache, or note. Prefer this over files for structured JSON records. |
+| tasks | `rh_task_create` / `rh_task_list` / `rh_task_next` / `rh_task_update` / `rh_task_delete` | `ctx.storageDomain` (typed `righthand_tasks` domain) | A task board with a state machine (open → done/failed). `rh_task_next` is the oldest open task — what to work on now. A failed task's `result` records what went wrong: a task that cannot run is still recorded, never silently dropped. |
 | secrets | `rh_credential_describe` / `rh_credential_set` / `rh_credential_unset` | `ctx.credentials` | The task must check, store, or remove a credential reference (e.g. `CLOUDFLARE_API_TOKEN`). Values are written durably and **never echoed back**. |
 | settings | `rh_settings_get` / `rh_settings_set` | `ctx.settings` (namespace `righthand`) | Reading or patching righthand settings (`accountId`, `defaultZone`, `defaultScriptPrefix`). |
 | exec | `rh_run` / `rh_run_bg` | `ctx.subprocess` + `ctx.jobs` | Running one command (argv array, no shell interpretation). `rh_run` collects bounded output; `rh_run_bg` starts an owner-scoped background job and returns its id. |
@@ -22,6 +23,13 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - One domain `righthand_store`: a `rows` table (string key → JSON value + timestamp) and a global write counter.
 - `rh_store_get` returns `{ found, key, value?, updatedAt? }` — `found: false` means the key is absent, not an error.
 - Writes are durable (backend flush before commit) and serialized on one write chain; values must be JSON-serializable.
+
+## Task semantics
+
+- One domain `righthand_tasks`: a `tasks` table keyed by generated task id (`t-...`).
+- States: `open` → `done` | `failed`. `rh_task_next` returns the oldest open task; nothing open returns `{ found: false }`.
+- `rh_task_update` takes a state and/or a `result` — a failed task should carry what was tried and what went wrong, so the record says what happened.
+- `rh_task_list` sorts open first (oldest first), then done, then failed; `state` filters.
 
 ## Credential semantics
 
@@ -45,5 +53,5 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Service availability
 
-- **web profile**: all twelve tools register (`storageDomain` is provided by the web app rows).
-- **other profiles** (e.g. headless): the store family stays dormant; the other seven tools still register. The plugin never fails the boot.
+- **web profile**: all sixteen tools register (`storageDomain` is provided by the web app rows).
+- **other profiles** (e.g. headless): the store and task families stay dormant; the other seven tools still register. The plugin never fails the boot.

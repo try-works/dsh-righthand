@@ -9,3 +9,8 @@ rh_store_delete             destructive=true mode=deny
 rh_store_get                destructive=false mode=none
 rh_store_list               destructive=false mode=none
 rh_store_put                destructive=false mode=none
+rh_task_create              destructive=false mode=none
+rh_task_delete              destructive=false mode=none
+rh_task_list                destructive=false mode=none
+rh_task_next                destructive=false mode=none
+rh_task_update              destructive=false mode=none

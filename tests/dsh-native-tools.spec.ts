@@ -13,7 +13,7 @@ import LocalSubprocessRuntime from '@deepseek-ai/dsh-subprocess-local'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { storeTools, secretsTools, execTools, guardTools, apply, inject, name } from '../src/index.ts'
+import { storeTools, secretsTools, execTools, taskTools, guardTools, apply, inject, name } from '../src/index.ts'
 
 const contexts: Context[] = []
 afterEach(async () => {
@@ -37,6 +37,7 @@ async function boot(tmp: string) {
   await ctx.plugin(storeTools)
   await ctx.plugin(secretsTools)
   await ctx.plugin(execTools)
+  await ctx.plugin(taskTools)
   await ctx.plugin(guardTools, { rules: [{ toolPrefix: 'rh_deny_', mode: 'deny' }] })
   return ctx
 }
@@ -127,6 +128,43 @@ describe('secrets-tools over ctx.credentials + ctx.settings', () => {
     await call(ctx, 'rh_settings_set', { patch: { accountId: '0bb0', defaultZone: 'ambiens.dev' } })
     const g2 = await call(ctx, 'rh_settings_get', {})
     expect(g2.value).toMatchObject({ accountId: '0bb0', defaultZone: 'ambiens.dev', defaultScriptPrefix: 'rh-' })
+  })
+})
+
+describe('task-tools over ctx.storageDomain', () => {
+  it('create/list/next/update/delete round-trips with the state machine', async () => {
+    const ctx = await boot(await mkdtemp(join(tmpdir(), 'rh-task-')))
+    const a = await call(ctx, 'rh_task_create', { title: 'first task' })
+    expect(a.isError).toBe(false)
+    expect((a.value as any).state).toBe('open')
+    const idA = (a.value as any).id
+
+    const b = await call(ctx, 'rh_task_create', { title: 'second task', due: '2026-09-01' })
+    const idB = (b.value as any).id
+
+    // next = oldest open first
+    const next = await call(ctx, 'rh_task_next', {})
+    expect((next.value as any).id).toBe(idA)
+
+    const list = await call(ctx, 'rh_task_list', {})
+    expect((list.value as any).map((t: any) => t.state)).toEqual(['open', 'open'])
+
+    // finish the first, fail the second with a recorded result
+    await call(ctx, 'rh_task_update', { id: idA, state: 'done', result: 'shipped' })
+    await call(ctx, 'rh_task_update', { id: idB, state: 'failed', result: 'build broke' })
+
+    const next2 = await call(ctx, 'rh_task_next', {})
+    expect((next2.value as any).found).toBe(false)
+
+    const open = await call(ctx, 'rh_task_list', { state: 'open' })
+    expect((open.value as any).length).toBe(0)
+    const failed = await call(ctx, 'rh_task_list', { state: 'failed' })
+    expect((failed.value as any)[0].title).toBe('second task')
+
+    const del = await call(ctx, 'rh_task_delete', { id: idA })
+    expect((del.value as any).existed).toBe(true)
+    const del2 = await call(ctx, 'rh_task_delete', { id: idA })
+    expect((del2.value as any).existed).toBe(false)
   })
 })
 

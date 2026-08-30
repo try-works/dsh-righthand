@@ -24,7 +24,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { storeTools, secretsTools, execTools, guardTools, guardFactsFor } from '../src/index.ts'
+import { storeTools, secretsTools, execTools, taskTools, guardTools, guardFactsFor } from '../src/index.ts'
 import type { GuardRule } from '../src/index.ts'
 
 const contexts: Context[] = []
@@ -66,6 +66,7 @@ async function boot(): Promise<Context> {
   await ctx.plugin(storeTools)
   await ctx.plugin(secretsTools)
   await ctx.plugin(execTools)
+  await ctx.plugin(taskTools)
   await ctx.plugin(guardTools, { rules: CANONICAL_RULES })
   return ctx
 }

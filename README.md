@@ -25,6 +25,7 @@ dsh --profile <profile> --patch ./cordis.patch.yml
 | Tool | Family | Backing service |
 |---|---|---|
 | `rh_store_put` / `rh_store_get` / `rh_store_delete` / `rh_store_list` | store | `ctx.storageDomain` (domain KV) |
+| `rh_task_create` / `rh_task_list` / `rh_task_next` / `rh_task_update` / `rh_task_delete` | tasks | `ctx.storageDomain` (typed `righthand_tasks` domain; state machine open → done/failed) |
 | `rh_credential_describe` / `rh_credential_set` / `rh_credential_unset` | secrets | `ctx.credentials` (values never echoed) |
 | `rh_settings_get` / `rh_settings_set` | secrets | `ctx.settings` (namespace `righthand`) |
 | `rh_run` | exec | `ctx.subprocess` (collect mode, bounded output) |
@@ -137,10 +138,10 @@ so the agent cannot deploy or destroy without the gate.
 
 ## Service availability
 
-The store family needs `ctx.storageDomain`, which the web profile provides
-(`storage` + `storage-json` + `storage-domain` rows). In a profile without
-it — e.g. the headless bundle — the store tools stay dormant and the other
-seven tools still register; the plugin never fails the boot.
+The store and task families need `ctx.storageDomain`, which the web profile
+provides (`storage` + `storage-json` + `storage-domain` rows). In a profile
+without it — e.g. the headless bundle — those nine tools stay dormant and the
+other seven tools still register; the plugin never fails the boot.
 
 ## Development
 
