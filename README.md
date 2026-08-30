@@ -6,6 +6,8 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
+The plugin also ships **blueprint guidance** — ten named recipes for the agent-built tools this plugin exists to compose (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+
 ## Install
 
 ```bash
@@ -59,6 +61,28 @@ Namespace "righthand" (registered by the secrets family):
 `rh_settings_get` returns the resolved values; `rh_settings_set` merges a
 partial patch (persisted by the harness settings provider).
 
+## Blueprints
+
+Blueprint guidance lives under `experiments/<blueprint>/` — each a
+`blueprint.json` spec plus a runnable template kit (`run.ts` + `test.ts`,
+`LEARNINGS.md`, and for the cloud-tested ones a `cloud/` Worker). They
+describe the tools this plugin composes; the daily-digest kit is the
+canonical example of the current DSH-native form (tool-to-tool via
+`ctx.tools.execute`, synthesis via `ctx.llm`, deliverables via `ctx.fs`).
+
+| Blueprint | What it builds |
+|---|---|
+| `blueprint/daily-digest` | Collect sources, summarize, send on a schedule — extractive locally, LLM synthesis as escalation |
+| `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
+| `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |
+| `blueprint/vision-worker` | Cloudflare Worker exposing kimi-k2.6 vision: route image requests for text-only models, return a versioned `VisionEnvelope` |
+| `blueprint/vision-qa-assistant` | Answer questions about images for a text-only model — hash-cache locally, Workers AI vision as the semantic path |
+| `blueprint/inbound-webhook-pipeline` | Receive → validate → run job → store → notify, with idempotency-key dedupe as the load-bearing invariant |
+| `blueprint/event-sourced-store` | Tool store where every mutation is an event: govern, checksum, append offset-addressable events, catch up by version |
+| `blueprint/governed-registry` | Register a tool format; every write runs the governed flow: validate → normalize → checksum → index → summarize |
+| `blueprint/mcp-tool-surface` | Deterministic + AI-backed tools behind a stateless MCP surface with normalized LLM output |
+| `blueprint/session-watcher` | Poll DSH sessions, evaluate a condition (new publish / builder idle / cadence), message a target session |
+
 ## Packaged skill
 
 The plugin ships the `dsh-righthand` skill
@@ -66,6 +90,36 @@ The plugin ships the `dsh-righthand` skill
 tool-reference tables, store/credential/settings semantics, guard modes, and
 service availability. It registers via `ctx.skills` on mount, so the agent's
 skill catalog lists it automatically.
+
+## Use cases
+
+Everything below runs through the harness's own services; nothing is
+hand-rolled.
+
+**Durable agent memory / task board.** Store task cards under `task:<slug>`
+and let `rh_store_list` enumerate them across restarts and context
+compaction — no project files touched. Complete by overwriting, clean up
+with `rh_store_delete`.
+
+**Pre-deploy gate.** Before any deploy: `rh_credential_describe` asserts the
+API token exists, `rh_settings_get` asserts the account/zone, `rh_run` runs
+tests + build, `rh_store_put` records a deploy receipt, and a guard rule
+gates the actual deploy tool behind `mode: 'ask'`.
+
+**Secret onboarding.** `rh_credential_set` stores a key through the
+credential provider (the value is never echoed back); `rh_credential_describe`
+reports configured state + source; rotation is unset-then-set.
+
+**Daily digests.** The agent fetches sources and stores them under
+`digest:<date>` (see `blueprint/daily-digest`), diffing days with
+`rh_store_get` and rendering MDX deliverables through `ctx.fs`.
+
+**CI-lite.** `rh_run_bg` starts a long build as an owner-scoped background
+job; its id + status live in the store so a later turn can poll and collect.
+
+**Governed exec.** Any high-impact command can be fronted by a guard rule
+(`deny` to block a prefix, `ask` to require a policy function's approval),
+so the agent cannot deploy or destroy without the gate.
 
 ## Service availability
 
