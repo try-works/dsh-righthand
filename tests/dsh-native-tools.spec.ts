@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
+import SkillRegistry from '@deepseek-ai/dsh-skill'
 import Storage from '@deepseek-ai/dsh-storage'
 import * as StorageJson from '@deepseek-ai/dsh-storage-json'
 import * as StorageDomain from '@deepseek-ai/dsh-storage-domain'
@@ -25,6 +26,7 @@ async function boot(tmp: string) {
   // Real harness services (paper-design boot pattern + the providers my tools inject).
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime, { mode: 'native' })
+  await ctx.plugin(SkillRegistry)
   await ctx.plugin(Storage)
   await ctx.plugin(StorageJson, { root: join(tmp, 'storage') })
   await ctx.plugin(StorageDomain, { backend: 'json' })
@@ -48,6 +50,7 @@ async function bootCombined(tmp: string) {
   contexts.push(ctx)
   await ctx.plugin(SystemPrompt)
   await ctx.plugin(ToolRuntime, { mode: 'native' })
+  await ctx.plugin(SkillRegistry)
   await ctx.plugin(Storage)
   await ctx.plugin(StorageJson, { root: join(tmp, 'storage') })
   await ctx.plugin(StorageDomain, { backend: 'json' })
@@ -184,5 +187,14 @@ describe('combined plugin entry (src/index.ts)', () => {
     } as any)
     const denied = await call(ctx, 'rh_deny_probe', {})
     expect(denied.isError).toBe(true)
+  })
+
+  it('registers the packaged dsh-righthand skill', async () => {
+    const ctx = await bootCombined(await mkdtemp(join(tmpdir(), 'rh-skill-')))
+    const skills = await ctx.skills.list()
+    const skill = skills.find(s => s.name === 'dsh-righthand')
+    expect(skill).toBeDefined()
+    expect(skill?.source).toBe('bundled')
+    expect(skill?.description).toContain('righthand toolkit')
   })
 })

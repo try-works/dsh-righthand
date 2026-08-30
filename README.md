@@ -59,6 +59,14 @@ Namespace "righthand" (registered by the secrets family):
 `rh_settings_get` returns the resolved values; `rh_settings_set` merges a
 partial patch (persisted by the harness settings provider).
 
+## Packaged skill
+
+The plugin ships the `dsh-righthand` skill
+(`skills/dsh-righthand/SKILL.md`, the dsh-plugin packaged-skill standard):
+tool-reference tables, store/credential/settings semantics, guard modes, and
+service availability. It registers via `ctx.skills` on mount, so the agent's
+skill catalog lists it automatically.
+
 ## Service availability
 
 The store family needs `ctx.storageDomain`, which the web profile provides

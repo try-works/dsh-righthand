@@ -1,7 +1,7 @@
 {
   "name": "@try-works/dsh-righthand",
   "description": "DeepSeek Harness plugin: DSH-native righthand tools — durable KV store, credential/settings management, governed exec, and a tool guard",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,7 +28,8 @@
     "@deepseek-ai/dsh-settings": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-subprocess": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-jobs": "^0.1.0-rc.5",
-    "@deepseek-ai/schemastery": "^3.18.1"
+    "@deepseek-ai/schemastery": "^3.18.1",
+    "@deepseek-ai/dsh-skill": "^0.1.0-rc.5"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "file:D:/deepseek-harness/vendor/cordis",
@@ -72,6 +73,7 @@
   "files": [
     "lib",
     "src",
+    "skills",
     "cordis.patch.yml",
     "README.md",
     "LICENSE"
