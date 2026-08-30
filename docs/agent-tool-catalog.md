@@ -86,13 +86,13 @@ would generate the whole set.
 | markets_convert / markets_list | CoinGecko / exchangerate APIs (free tier) |
 | routes_directions / routes_eta / routes_nearest | OSRM public server |
 | maps_tile / maps_area | static tile URLs (OSM) |
-| prayer_times / prayer_qibla | computed locally (astronomical) or Aladhan API |
 | news_list / news_read / news_search | RSS + index (the daily-digest fetcher generalised) |
 
 ### Out of scope for the core plugin (note in guidance, don't build)
 
 | Mu | Why skip |
 |---|---|
+| prayer_* (times, qibla, verse, hadith, reflection, search) | Muslim/Islamic tools are out of scope by explicit instruction |
 | mail_send / mail_inbox | needs a mail provider key (Resend/MailChannels) — violates the keyless rule; account-scoped reputation |
 | sms_send / sms_history | Twilio-style key — violates the keyless rule |
 | images_generate | Workers AI image gen is the natural fit — the user's own Cloudflare account, optional paid plugin |
@@ -184,4 +184,5 @@ Deliberately NOT incorporated below the fold.
 | memory-as-history fix | already how the DSH agent loop works — only prompt-building tools inherit the rule |
 | internal/ layering test | Cordis + the harness enforce the equivalent; the tool-to-tool rule goes in guidance instead |
 | keyed third parties (Twilio, Resend, paid APIs) | the keyless rule: any service that requires an API token or credentials is out |
+| prayer_* / Muslim or Islam-related tools | out of scope by explicit instruction |
 
