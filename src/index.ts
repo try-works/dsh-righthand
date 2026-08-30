@@ -8,7 +8,7 @@
  * The package's plugin entry (name/inject/apply) mounts the four tool
  * modules as child fibers; each child waits on its own services, so a
  * profile without `storageDomain` (e.g. headless) simply gets the other
- * nine tools instead of failing the boot.
+ * seven tools instead of failing the boot.
  *
  * Modules (each individually mountable via `export * as ...`):
  * - store-tools:     rh_store_put/get/delete/list over ctx.storageDomain

@@ -64,7 +64,7 @@ partial patch (persisted by the harness settings provider).
 The store family needs `ctx.storageDomain`, which the web profile provides
 (`storage` + `storage-json` + `storage-domain` rows). In a profile without
 it — e.g. the headless bundle — the store tools stay dormant and the other
-nine tools still register; the plugin never fails the boot.
+seven tools still register; the plugin never fails the boot.
 
 ## Development
 

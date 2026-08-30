@@ -8,7 +8,7 @@
 #   guard-tools    tools/pre-execute policy       needs tools
 #
 # A profile without `storageDomain` (e.g. headless) simply gets the other
-# nine tools; the store family stays dormant instead of failing the boot.
+# seven tools; the store family stays dormant instead of failing the boot.
 - insert:
     - id: dsh-righthand
       name: '@try-works/dsh-righthand'
