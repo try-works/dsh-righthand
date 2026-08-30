@@ -58,4 +58,6 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
 export { storeTools, secretsTools, execTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
+export { guardFactsFor } from './guard-tools.ts'
+export type { GuardFacts } from './guard-tools.ts'
 

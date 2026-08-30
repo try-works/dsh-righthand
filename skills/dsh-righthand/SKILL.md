@@ -39,7 +39,9 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 
 ## Guard policy
 
-Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask? }]`). `deny` throws before dispatch; `ask` defers to the policy function (return true to allow); `allow` passes through. Tools matching no rule are unaffected.
+Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructive? }]`). `deny` throws before dispatch; `ask` defers to the policy function (return true to allow); `allow` passes through. Tools matching no rule are unaffected. Prefixes match by prefix — `rh_run` also covers `rh_run_bg`.
+
+`destructive: true` is a documentation flag for irreversible effects (deploy, delete, DNS change); it never changes enforcement, only records why a prefix is gated. `tests/permissions.golden` records every tool's derived guard facts; a guard change that moves a fact fails the test until re-baselined (`UPDATE_GOLDEN=1 pnpm test`).
 
 ## Service availability
 

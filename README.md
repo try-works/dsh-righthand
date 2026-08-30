@@ -48,6 +48,13 @@ dsh --profile <profile> --patch ./cordis.patch.yml
 Guard modes: `allow` (pass through), `deny` (block with an error), `ask`
 (defer to the policy function). Omitted rules leave the guard inert.
 
+Rules may also declare `destructive: true` — a documentation flag for
+irreversible effects (deploy, delete, DNS change). It does not change
+enforcement; it records *why* the prefix is gated, and
+`tests/permissions.golden` records every `rh_*` tool's derived guard facts so
+guard changes are never silent (run `UPDATE_GOLDEN=1 pnpm test` to
+re-baseline deliberately).
+
 ## Settings
 
 Namespace "righthand" (registered by the secrets family):
