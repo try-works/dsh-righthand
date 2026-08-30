@@ -1,0 +1,18 @@
+# @try-works/dsh-righthand — bundle patch.
+# One bare-name row mounts the combined plugin, which mounts its four tool
+# families as child fibers (each child waits on its own services):
+#
+#   store-tools    rh_store_put/get/delete/list   needs ctx.storageDomain (web profile)
+#   secrets-tools  rh_credential_* / rh_settings_* needs credentials + settings
+#   exec-tools     rh_run / rh_run_bg             needs subprocess + jobs
+#   guard-tools    tools/pre-execute policy       needs tools
+#
+# A profile without `storageDomain` (e.g. headless) simply gets the other
+# nine tools; the store family stays dormant instead of failing the boot.
+- insert:
+    - id: dsh-righthand
+      name: '@try-works/dsh-righthand'
+      # config:
+      #   rules:
+      #     - toolPrefix: 'rh_'
+      #       mode: 'ask'
