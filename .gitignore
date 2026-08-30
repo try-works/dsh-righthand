@@ -16,9 +16,10 @@ pnpm-workspace.yaml
 
 # Experiment blueprints (contain live account ids — never commit)
 experiments/*
-# ...except the daily-digest blueprint guidance kit (secret-scanned clean).
+# ...except the blueprint guidance kits (secret-scanned clean).
 !experiments/blueprint-daily-digest/
 experiments/blueprint-daily-digest/cloud/.wrangler/
+!experiments/blueprint-data-adapter/
 
 # Never commit secrets or the npm token file
 *.token.txt

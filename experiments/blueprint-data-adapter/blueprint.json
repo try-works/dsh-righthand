@@ -1,0 +1,59 @@
+{
+  "name": "blueprint/data-adapter",
+  "kind": "blueprint",
+  "description": "Wrap one keyless public API as a righthand tool family: guarded fetch (SSRF checklist), normalize to a stable shape, one tool per query. Weather (Open-Meteo) is the worked example, shipped as src/weather-tools.ts.",
+  "keywords": [
+    "adapter",
+    "api",
+    "keyless",
+    "fetch",
+    "weather",
+    "data",
+    "normalize",
+    "ssrf",
+    "cache"
+  ],
+  "use_cases": [
+    "keyless public API",
+    "wrap an endpoint as tools",
+    "data tool",
+    "cache public data"
+  ],
+  "ingredients": [
+    "guardedFetch (SSRF checklist)",
+    "normalize function per response",
+    "rh_store caching (optional escalation)",
+    "defineTool per query"
+  ],
+  "recipe": "probe the endpoint live -> fixture from the real response -> normalize to a stable shape -> one tool per query, all through guardedFetch -> optional rh_store TTL cache",
+  "result_kind": "tool family",
+  "invoke_contract": {
+    "input": "query params (lat/lon, name, id)",
+    "output": "stable normalized object"
+  },
+  "config_variants": {
+    "cache": "none | rh_store TTL",
+    "endpoints": "default keyless URLs | test fixtures"
+  },
+  "cost_hint": "free (keyless endpoints; caching reduces repeat calls)",
+  "pitfalls": [
+    "probe the endpoint before writing the normalizer (wire shape drifts)",
+    "fixture-test the normalizer against a REAL captured response",
+    "SSRF checklist: public destinations only, revalidate every redirect hop, cap size + time",
+    "DNS answers can mix public and private records - block if ANY address is private",
+    "a keyless API can still rate-limit; cache before you retry",
+    "never put an API token in the adapter - a key requirement puts the service out of scope"
+  ],
+  "local_limits": "only endpoints reachable from the user's machine; no server-side cache between sessions",
+  "cloud_limits": "same endpoints via the user's own Cloudflare account; Workers egress to keyless APIs is free for most",
+  "related": [
+    "blueprint/daily-digest",
+    "blueprint/research-radar",
+    "righthand/web-fetch"
+  ],
+  "template": {
+    "worked_example": "src/weather-tools.ts",
+    "test": "tests/weather.spec.ts",
+    "learnings": "LEARNINGS.md"
+  }
+}
