@@ -61,10 +61,15 @@ third-party-keyed, out of scope for the core plugin.
 | `rh_task_*` | tasks_* | `rh_store` domain `tasks` (state machine: open → done, `tasks_next`) | small — the store family already proves the pattern |
 | `rh_text_*` | text_classify / text_extract / text_summarise / text_translate | `ctx.llm` (same route as digest summaries) | small — JSON-constrained prompts, one tool per verb |
 | `rh_files_*` | files_put/get/list/share | Cloudflare R2 (put → object URL; share → public/private toggle) | medium — first real "Cloudflare primitive" family |
-| `rh_notify_*` | notify_send/devices | ntfy.sh topic (keyless) or web-push; store device/topic registry in `rh_store` | small |
+| `rh_notify_*` | notify_send/devices | ntfy.sh topic (keyless — the topic name is the only secret, no token) or web-push (self-generated VAPID); store device/topic registry in `rh_store` | small |
 | `rh_events_*` | events_create/list/free | `rh_store` + Cloudflare cron trigger (or OS scheduler locally) | medium — scheduling is the hard half |
 
 ### Keyless data adapters (blueprint material — one pattern, many tools)
+
+> Constraint (2026-08-30): third-party services are allowed **only when they
+> need no API token or credentials** — keyless public endpoints. Anything
+> that needs a key (Twilio, Resend, paid tiers) is out. All of these are
+> keyless.
 
 These are all the same shape as `blueprint/daily-digest` + `research-radar`
 adapters: a keyless HTTP API, a probe + fixture test, normalize, cache in
@@ -88,9 +93,9 @@ would generate the whole set.
 
 | Mu | Why skip |
 |---|---|
-| mail_send / mail_inbox | needs a mail provider key (Resend/MailChannels); account-scoped reputation |
-| sms_send / sms_history | Twilio-style key |
-| images_generate | Workers AI image gen is the natural fit — paid, optional plugin |
+| mail_send / mail_inbox | needs a mail provider key (Resend/MailChannels) — violates the keyless rule; account-scoped reputation |
+| sms_send / sms_history | Twilio-style key — violates the keyless rule |
+| images_generate | Workers AI image gen is the natural fit — the user's own Cloudflare account, optional paid plugin |
 | wallet_* (USDC on Base) | custodial payments, regulatory surface |
 | chat/social/stream/blog/users | instance-local social graph — nothing to attach to in a personal harness |
 | apps_create/build/fork | a whole hosting surface; closest righthand form is Cloudflare Workers deployment (`blueprint/vision-worker` shape), a phase-2 plugin |
@@ -161,7 +166,9 @@ Deliberately NOT incorporated below the fold.
    no limits.
 7. **Data-adapter blueprint with the SSRF checklist** (lesson 6). The
    fetcher blueprint guidance must carry: block non-public destinations,
-   revalidate every redirect hop, cap size and time.
+   revalidate every redirect hop, cap size and time. Adapters may call any
+   **keyless** public endpoint — an API token requirement is the line that
+   puts a service out of scope.
 
 ### Deliberately not incorporated
 
@@ -176,4 +183,5 @@ Deliberately NOT incorporated below the fold.
 | wallet_* (USDC, x402) | payments/regulatory surface, absent by design |
 | memory-as-history fix | already how the DSH agent loop works — only prompt-building tools inherit the rule |
 | internal/ layering test | Cordis + the harness enforce the equivalent; the tool-to-tool rule goes in guidance instead |
+| keyed third parties (Twilio, Resend, paid APIs) | the keyless rule: any service that requires an API token or credentials is out |
 
