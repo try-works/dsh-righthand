@@ -175,10 +175,15 @@ visible).
 
 ## What this means for the righthand build order
 
+> Constraints (2026-08-30): TypeScript only — no Go. Single user — no
+> accounts, no rationing: Mu's identity tiers (`requires`) and per-day
+> `limit` counts are out; the `destructive` marker and the golden-file
+> discipline stay. Tools are built by the user's own agent and run locally
+> or on the user's own Cloudflare account.
+
 1. **Spec + golden first**: a permissions.golden over the existing `rh_*`
-   tools, then the guard rule fields (`requires`, `destructive`) it
-   records. This is Mu's own ordering — record the answer before changing
-   the model.
+   tools, then the `destructive` marker it records. This is Mu's own
+   ordering — record the answer before changing the model.
 2. **`rh_task_*` + `rh_text_*`** (catalog doc §build order) — tasks
    implements §4 (assigned work, always say something), text implements
    §7's prompt discipline.

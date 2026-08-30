@@ -18,9 +18,15 @@ The commit collapses five declared flags into two derived facts:
 | `Destructive` | an irreversible effect nobody asked for; the flag exists because tool *descriptions* are attacker-controlled text, so a tool that holds one is a prompt-injection surface |
 
 Lessons for righthand's guard:
-1. guard rules today are prefix-based allow/deny/ask; the Mu model adds two
-   orthogonal axes — **identity tiers** (Open/Caller/Account) and a
-   **destructive marker** — worth porting as optional rule fields.
+1. Mu's identity tiers (Open/Caller/Account) and its `limit` per-day counts
+   are **not applicable** here: righthand is a single user — the tools are
+   built by that user's own agent and run locally or on the user's own
+   Cloudflare account. There are no accounts to tier and nothing to ration.
+   What *does* carry over is the **destructive marker**: an irreversible
+   effect the agent's own tool descriptions could talk it into (a deploy, a
+   delete, a DNS change) is the prompt-injection surface the guard exists
+   for, and prefix-based allow/deny/ask already covers it — the marker just
+   makes the reasoning explicit.
 2. **Golden-file the derived permissions** (`test/permissions.golden`):
    baseline every tool's permission from the derived policy and let the test
    fail when one changes. The commit's own debugging is the guidance: the
@@ -92,20 +98,34 @@ would generate the whole set.
 
 ## Suggested build order
 
-1. **Permission upgrade in guard-tools** (the commit's lesson): optional
-   `requires: open|caller|account` + `destructive: true` rule fields + a
-   `tests/permissions.golden` over all `rh_*` tools. Smallest change, directly
-   from the commit.
+> Constraint (2026-08-30): TypeScript only, no Go. Single user — no accounts,
+> no rationing, no identity tiers. Every tool is built by the user's own
+> agent and runs locally or on the user's own Cloudflare account. The
+> `requires`/`limit` axes from Mu are dropped; the `destructive` marker and
+> the golden-file discipline stay.
+
+1. **Guard upgrade**: `destructive: true` marker on guard rules + a
+   `tests/permissions.golden` over all `rh_*` tools recording destructive
+   flags and guard modes. Prefix-based allow/deny/ask stays — the marker
+   documents *why* a prefix is guarded, and the golden catches drift.
 2. **`rh_task_*` + `rh_text_*`** — both tiny over existing services, and
    together they cover Mu's most-used families (tasks, notes, text).
 3. **One data-adapter blueprint** (weather or places as the demo) + the
-   recipe that generates the rest.
+   recipe that generates the rest, all running locally or as the user's own
+   Workers.
 4. **`rh_files_*` on R2** — the first family that is *actually on a
-   Cloudflare primitive*, the plugin's stated purpose.
+   Cloudflare primitive* (the user's own R2), the plugin's stated purpose.
 5. `rh_events_*`, `rh_notify_*`, then the out-of-scope list as optional
    plugins.
 
 ## Incorporation decisions (from mu-repo-analysis.md)
+
+> Constraints (2026-08-30): **TypeScript only — no Go.** Single user —
+> **no accounts, no rationing**: nothing to tier, nothing to meter per-day.
+> Every tool is built by the user's own agent and runs locally or on the
+> user's own Cloudflare account. Mu lessons that presuppose a multi-user
+> server (identity tiers, limits, quotas, wallets, address spaces) are out;
+> the engineering discipline carries over.
 
 The architecture read produced eleven lessons; these are the ones worth
 incorporating now, each mapped to a concrete righthand change, in order.
@@ -115,13 +135,15 @@ Deliberately NOT incorporated below the fold.
 
 1. **Permissions golden first** (Mu lesson 2). Record the answer before
    changing the model: `tests/permissions.golden`, one line per `rh_*` tool
-   (`destructive`, `requires`, guard-relevant facts). Any guard refactor
+   recording its **destructive flag** and guard mode. Any guard refactor
    that leaves the file unchanged is behaviour-preserving; any diff is the
    list of doors that moved.
-2. **Guard rules gain `requires` + `destructive` + `limit`** (lessons 2, 9,
-   10). `requires: open|caller|account` (identity tiers), `destructive:
-   true` (irreversible effects — the prompt-injection surface), `limit: N`
-   (hard per-day count, checked before the mode). allow/deny/ask stays.
+2. **Guard rules gain a `destructive` marker** (lessons 2). Prefix-based
+   allow/deny/ask stays; `destructive: true` documents *why* a prefix is
+   guarded — irreversible effects (deploy, delete, DNS change) are the
+   prompt-injection surface. The marker is declarative only: the enforcement
+   is still the rule's mode. No identity tiers, no limits — there is one
+   user and nothing to ration.
 3. **Scope = catalogue** (lesson 10). The visible catalogue and the
    enforceable scope must be one mechanism: the SKILL.md and README tool
    tables must state what a guard rule gates, and the golden must derive
@@ -134,8 +156,9 @@ Deliberately NOT incorporated below the fold.
    over `ctx.llm`, reusing the digest summarizer's prompt discipline: roles
    stay roles, caps are deliberate, per-call failure contained.
 6. **Settings hygiene** (lesson 11). Every settings key must have a
-   consumer or go; document price vs limit in the namespace (storage and
-   agent work are free; fetches cost).
+   consumer or go. The namespace holds the user's own Cloudflare account
+   facts (`accountId`, `defaultZone`, `defaultScriptPrefix`) — no pricing,
+   no limits.
 7. **Data-adapter blueprint with the SSRF checklist** (lesson 6). The
    fetcher blueprint guidance must carry: block non-public destinations,
    revalidate every redirect hop, cap size and time.
@@ -144,10 +167,13 @@ Deliberately NOT incorporated below the fold.
 
 | Mu feature | Reason |
 |---|---|
+| Go services / handlers | righthand is TypeScript on the DSH harness |
+| `requires` identity tiers (Open/Caller/Account) | single user — no accounts to tier |
+| `limit` per-day counts / quota.json pricing | single user — nothing to ration, nothing to meter |
 | Spec.Card renderers | the web GUI owns turn summaries; righthand outputs carry `fetchedAt` instead |
 | held-state judge (agent/gate) | guard `ask` is the local judge; a full inbound queue needs a product surface |
 | agents-as-accounts / inbox address space | a product, not a plugin — the DSH harness already is the agent host |
-| quota.json pricing machinery | single-owner harness; settings keys + guard limits cover it |
+| wallet_* (USDC, x402) | payments/regulatory surface, absent by design |
 | memory-as-history fix | already how the DSH agent loop works — only prompt-building tools inherit the rule |
 | internal/ layering test | Cordis + the harness enforce the equivalent; the tool-to-tool rule goes in guidance instead |
 
