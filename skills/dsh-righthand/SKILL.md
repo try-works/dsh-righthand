@@ -1,6 +1,6 @@
 ---
 name: dsh-righthand
-description: Use when a task needs the righthand toolkit — durable key-value storage (rh_store_*), a task board (rh_task_*), reminders (rh_events_*), credential and settings management (rh_credential_* / rh_settings_*), governed command execution (rh_run / rh_run_bg), language work (rh_text_*), weather/air data (rh_weather_*), R2 file tools (rh_files_*), ntfy push (rh_notify_send), or its tool guard policy. Covers tool reference, guard semantics, and service availability.
+description: Use when a task needs the righthand toolkit — durable key-value storage (rh_store_*), a task board (rh_task_*), reminders (rh_events_*), credential and settings management (rh_credential_* / rh_settings_*), governed command execution (rh_run / rh_run_bg), language work (rh_text_*), weather/air data (rh_weather_*), places data (rh_places_*), R2 file tools (rh_files_*), ntfy push (rh_notify_send), or its tool guard policy. Covers tool reference, guard semantics, and service availability.
 ---
 
 # dsh-righthand
@@ -18,6 +18,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | exec | `rh_run` / `rh_run_bg` | `ctx.subprocess` + `ctx.jobs` | Running one command (argv array, no shell interpretation). `rh_run` collects bounded output; `rh_run_bg` starts an owner-scoped background job and returns its id. |
 | text | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | `ctx.llm` (one model call per verb) | Language work: shorten, turn into JSON matching a schema, sort into your labels with confidence, or translate preserving formatting. |
 | weather | `rh_weather_forecast` / `rh_weather_air` | Open-Meteo (keyless) via the SSRF-guarded fetcher | Current conditions + 3-day min/max, or PM2.5/PM10/AQI, for a lat/lon. Keyless only — anything needing an API token is out of scope. |
+| places | `rh_places_geocode` / `rh_places_address` / `rh_places_elevation` / `rh_places_nearby` | Nominatim/OSM + Open-Meteo (both keyless) via the SSRF-guarded fetcher | Geocode text to places, reverse a lat/lon to an address, get elevation, or find what is near a point — `rh_places_geocode` covers keyword search too. |
 | files | `rh_files_put` / `rh_files_get` / `rh_files_list` / `rh_files_share` / `rh_files_delete` | Cloudflare R2 (the user's own account) | Store/read/list/share/delete objects in an R2 bucket. `rh_files_share` returns a presigned download URL valid for N minutes (default 60, max 7 days) — anyone with the URL can read it for that window. |
 | events | `rh_events_create` / `rh_events_due` / `rh_events_list` / `rh_events_free` / `rh_events_cancel` | `ctx.storageDomain` (typed `righthand_events` domain) | Reminders. The agent IS the scheduler: `rh_events_due` each turn returns pending events whose time has come and marks them notified — delivered exactly once, never silently dropped. `rh_events_free` finds free slots within local working hours 09:00–17:00. |
 | notify | `rh_notify_send` | ntfy.sh (keyless) | Interrupt yourself on your own devices: publish to a topic; subscribed devices receive it. The topic name is the only secret — use an unguessable one. |
@@ -47,6 +48,13 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - Every request is SigV4-signed (region `auto`); the signer is pinned to the AWS published test vector.
 - Content is text (`text/plain` default, override with `contentType`); `rh_files_get` returns `found: false` for absent keys, not an error.
 - `rh_files_share` presigns a GET — treat the URL as a secret for its validity window.
+
+## Places semantics
+
+- Two keyless providers: Nominatim (geocoding, reverse, nearby) and Open-Meteo (elevation). No tokens; requests carry a User-Agent because Nominatim's public usage policy requires one — respect the 1 req/s limit, agent-paced calls only.
+- The wire shape is the provider's; the tool shape is `{ name, lat, lon, displayName, category, type, address }`. Search tools return a root array.
+- `rh_places_nearby` bounds the query with a viewbox (`bounded=1`) and attaches a computed `distanceKm`, sorted nearest first.
+- A reverse geocode miss surfaces as a clean error, not a zeroed place.
 
 ## Weather semantics
 
@@ -92,5 +100,5 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Service availability
 
-- **web profile**: all thirty-three tools register (`storageDomain` is provided by the web app rows).
-- **other profiles** (e.g. headless): the store, task and events families stay dormant (no `storageDomain`); the other nineteen tools (secrets, settings, exec, text, weather, files, notify) still register. The plugin never fails the boot.
+- **web profile**: all thirty-seven tools register (`storageDomain` is provided by the web app rows).
+- **other profiles** (e.g. headless): the store, task and events families stay dormant (no `storageDomain`); the other twenty-three tools (secrets, settings, exec, text, weather, places, files, notify) still register. The plugin never fails the boot.

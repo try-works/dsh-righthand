@@ -28,6 +28,7 @@ dsh --profile <profile> --patch ./cordis.patch.yml
 | `rh_task_create` / `rh_task_list` / `rh_task_next` / `rh_task_update` / `rh_task_delete` | tasks | `ctx.storageDomain` (typed `righthand_tasks` domain; state machine open → done/failed) |
 | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | text | `ctx.llm` (one model call per verb) |
 | `rh_weather_forecast` / `rh_weather_air` | weather | Open-Meteo (keyless), every request through the SSRF-guarded fetcher |
+| `rh_places_geocode` / `rh_places_address` / `rh_places_elevation` / `rh_places_nearby` | places | Nominatim/OSM + Open-Meteo (keyless; User-Agent per Nominatim's 1 req/s usage policy) |
 | `rh_files_put` / `rh_files_get` / `rh_files_list` / `rh_files_share` / `rh_files_delete` | files | Cloudflare R2 (S3-compatible, SigV4-signed; credentials from `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, bucket from settings) |
 | `rh_events_create` / `rh_events_due` / `rh_events_list` / `rh_events_free` / `rh_events_cancel` | events | `ctx.storageDomain` (typed `righthand_events` domain; the agent is the scheduler — `rh_events_due` runs each turn) |
 | `rh_notify_send` | notify | ntfy.sh (keyless — the topic name is the only secret) |
@@ -150,8 +151,9 @@ so the agent cannot deploy or destroy without the gate.
 The store, task and events families need `ctx.storageDomain`, which the web
 profile provides (`storage` + `storage-json` + `storage-domain` rows). In a
 profile without it — e.g. the headless bundle — those fourteen tools stay
-dormant and the other nineteen tools (secrets, settings, exec, text, weather,
-files, notify) still register; the plugin never fails the boot.
+dormant and the other twenty-three tools (secrets, settings, exec, text,
+weather, places, files, notify) still register; the plugin never fails the
+boot.
 
 ## Development
 

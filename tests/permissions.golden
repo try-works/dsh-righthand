@@ -12,6 +12,10 @@ rh_files_list               destructive=false mode=none
 rh_files_put                destructive=false mode=none
 rh_files_share              destructive=false mode=none
 rh_notify_send              destructive=false mode=none
+rh_places_address           destructive=false mode=none
+rh_places_elevation         destructive=false mode=none
+rh_places_geocode           destructive=false mode=none
+rh_places_nearby            destructive=false mode=none
 rh_run                      destructive=false mode=allow
 rh_run_bg                   destructive=false mode=allow
 rh_settings_get             destructive=false mode=none

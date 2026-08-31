@@ -9,9 +9,9 @@
  * and the packaged skill as child fibers; each child waits on its own
  * services, so a
  * profile without `storageDomain` (e.g. headless) simply gets the
- * store/task/events families dormant and the other nineteen tools
- * (secrets, settings, exec, text, weather, files, notify) instead of
- * failing the boot.
+ * store/task/events families dormant and the other twenty-three tools
+ * (secrets, settings, exec, text, weather, places, files, notify) instead
+ * of failing the boot.
  *
  * Modules (each individually mountable via `export * as ...`):
  * - store-tools:     rh_store_put/get/delete/list over ctx.storageDomain
@@ -19,6 +19,7 @@
  * - task-tools:      rh_task_create/list/next/update/delete over ctx.storageDomain
  * - text-tools:      rh_text_summarise/extract/classify/translate over ctx.llm
  * - weather-tools:   rh_weather_forecast/air over Open-Meteo (keyless, SSRF-guarded)
+ * - places-tools:    rh_places_geocode/address/elevation/nearby (Nominatim + Open-Meteo, keyless)
  * - files-tools:     rh_files_put/get/list/share/delete over Cloudflare R2
  * - events-tools:    rh_events_create/due/list/free/cancel over ctx.storageDomain
  * - notify-tools:    rh_notify_send over ntfy.sh (keyless)
@@ -37,6 +38,7 @@ import * as guardTools from './guard-tools.ts'
 import * as taskTools from './task-tools.ts'
 import * as textTools from './text-tools.ts'
 import * as weatherTools from './weather-tools.ts'
+import * as placesTools from './places-tools.ts'
 import * as filesTools from './files-tools.ts'
 import * as eventsTools from './events-tools.ts'
 import * as notifyTools from './notify-tools.ts'
@@ -67,6 +69,7 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(taskTools)
   ctx.plugin(textTools)
   ctx.plugin(weatherTools)
+  ctx.plugin(placesTools)
   ctx.plugin(filesTools)
   ctx.plugin(eventsTools)
   ctx.plugin(notifyTools)
@@ -75,16 +78,18 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, filesTools, eventsTools, notifyTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, placesTools, filesTools, eventsTools, notifyTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'
 export type { GuardFacts } from './guard-tools.ts'
 export { isBlockedIP, guardedFetch, normalizeForecast, normalizeAir } from './weather-tools.ts'
+export { normalizePlace, normalizePlaces, normalizeElevation, distanceKm, nearbyViewbox } from './places-tools.ts'
 export { createR2Client, R2_ACCESS_KEY_REF, R2_SECRET_KEY_REF } from './files-tools.ts'
 export { signRequest, presignGet } from './sigv4.ts'
 export { freeSlots } from './events-tools.ts'
 export type { Event } from './events-tools.ts'
 export type { R2Options, ListEntry } from './files-tools.ts'
 export type { WeatherConfig, ForecastOut, AirOut } from './weather-tools.ts'
+export type { PlacesConfig, PlaceOut, ElevationOut } from './places-tools.ts'
 

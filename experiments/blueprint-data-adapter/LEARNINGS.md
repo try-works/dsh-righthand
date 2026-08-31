@@ -42,3 +42,22 @@ set from the catalog.
   markets, routes, maps, news) is instantiable from this recipe as-is;
   each needs only its endpoint probe + normalizer + fixture.
 
+## Places instantiation (2026-08-31, shipped 0.1.9)
+
+- Second family from this recipe: src/places-tools.ts (rh_places_geocode /
+  address / elevation / nearby) over Nominatim + Open-Meteo elevation, all
+  probed live and keyless (200, no key, sub-second).
+- Learnings:
+  1. Nominatim's usage policy needs a User-Agent and agent-paced calls
+     (1 req/s) - guardedFetch's init.headers carries it; the tool
+     description states the limit.
+  2. Reverse geocode misses come back as {error: "Unable to geocode"} with
+     HTTP 200 - the tool surfaces that as a clean error instead of a
+     zeroed place.
+  3. nearby = bounded search: a viewbox of left,top,right,bottom
+     (lon,lat pairs) + bounded=1; distanceKm is computed client-side
+     (haversine) and attached, nearest first - Nominatim returns no
+     distance.
+  4. Shared guard modules reused as-is: guardedFetch/isBlockedIP are
+     imported from weather-tools, no fork.
+

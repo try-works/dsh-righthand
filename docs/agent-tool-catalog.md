@@ -79,7 +79,7 @@ would generate the whole set.
 | Mu | Keyless source |
 |---|---|
 | weather_air / weather_forecast / weather_history / weather_marine | Open-Meteo (no key) |
-| places_geocode / places_address / places_elevation / places_nearby / places_search | Nominatim (OSM), no key |
+| places_geocode / places_address / places_elevation / places_nearby / places_search | Nominatim (OSM), no key — **shipped 0.1.9** as `rh_places_geocode` / `rh_places_address` / `rh_places_elevation` / `rh_places_nearby` (search is covered by geocode) |
 | flights_airport / flights_overhead / flights_track | OpenSky Network (anonymous tier) |
 | hazards_quakes / hazards_alerts / hazards_floods | USGS / GDACS / UK EA flood API |
 | food_product / food_search | Open Food Facts (no key) |
