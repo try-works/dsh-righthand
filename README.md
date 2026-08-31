@@ -28,6 +28,7 @@ dsh --profile <profile> --patch ./cordis.patch.yml
 | `rh_task_create` / `rh_task_list` / `rh_task_next` / `rh_task_update` / `rh_task_delete` | tasks | `ctx.storageDomain` (typed `righthand_tasks` domain; state machine open → done/failed) |
 | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | text | `ctx.llm` (one model call per verb) |
 | `rh_weather_forecast` / `rh_weather_air` | weather | Open-Meteo (keyless), every request through the SSRF-guarded fetcher |
+| `rh_files_put` / `rh_files_get` / `rh_files_list` / `rh_files_share` / `rh_files_delete` | files | Cloudflare R2 (S3-compatible, SigV4-signed; credentials from `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`, bucket from settings) |
 | `rh_credential_describe` / `rh_credential_set` / `rh_credential_unset` | secrets | `ctx.credentials` (values never echoed) |
 | `rh_settings_get` / `rh_settings_set` | secrets | `ctx.settings` (namespace `righthand`) |
 | `rh_run` | exec | `ctx.subprocess` (collect mode, bounded output) |
@@ -67,6 +68,7 @@ Namespace "righthand" (registered by the secrets family):
 | `accountId` | "" | Cloudflare account id used by righthand Cloudflare tools |
 | `defaultScriptPrefix` | "rh-" | default name prefix for generated workers/scripts |
 | `defaultZone` | "" | default Cloudflare zone |
+| `defaultR2Bucket` | "" | default R2 bucket for `rh_files_*` |
 
 `rh_settings_get` returns the resolved values; `rh_settings_set` merges a
 partial patch (persisted by the harness settings provider).
@@ -84,6 +86,7 @@ canonical example of the current DSH-native form (tool-to-tool via
 |---|---|
 | `blueprint/daily-digest` | Collect sources, summarize, send on a schedule — extractive locally, LLM synthesis as escalation |
 | `blueprint/data-adapter` | Wrap one keyless public API as a tool family: guarded fetch, normalize, one tool per query. Worked example ships in the plugin: `rh_weather_*` |
+| (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |
 | `blueprint/vision-worker` | Cloudflare Worker exposing kimi-k2.6 vision: route image requests for text-only models, return a versioned `VisionEnvelope` |

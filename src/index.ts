@@ -17,6 +17,7 @@
  * - task-tools:      rh_task_create/list/next/update/delete over ctx.storageDomain
  * - text-tools:      rh_text_summarise/extract/classify/translate over ctx.llm
  * - weather-tools:   rh_weather_forecast/air over Open-Meteo (keyless, SSRF-guarded)
+ * - files-tools:     rh_files_put/get/list/share/delete over Cloudflare R2
  * - exec-tools:      rh_run / rh_run_bg over ctx.subprocess + ctx.jobs
  * - guard-tools:     tools/pre-execute policy (config.rules)
  * - skills:          the packaged dsh-righthand skill (ctx.skills)
@@ -32,6 +33,7 @@ import * as guardTools from './guard-tools.ts'
 import * as taskTools from './task-tools.ts'
 import * as textTools from './text-tools.ts'
 import * as weatherTools from './weather-tools.ts'
+import * as filesTools from './files-tools.ts'
 import * as righthandSkills from './skills.ts'
 import type { GuardRule } from './guard-tools.ts'
 
@@ -59,16 +61,20 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(taskTools)
   ctx.plugin(textTools)
   ctx.plugin(weatherTools)
+  ctx.plugin(filesTools)
   ctx.plugin(guardTools, { rules: config.rules ?? [] })
   ctx.plugin(righthandSkills)
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, filesTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'
 export type { GuardFacts } from './guard-tools.ts'
 export { isBlockedIP, guardedFetch, normalizeForecast, normalizeAir } from './weather-tools.ts'
+export { createR2Client, R2_ACCESS_KEY_REF, R2_SECRET_KEY_REF } from './files-tools.ts'
+export { signRequest, presignGet } from './sigv4.ts'
+export type { R2Options, ListEntry } from './files-tools.ts'
 export type { WeatherConfig, ForecastOut, AirOut } from './weather-tools.ts'
 
