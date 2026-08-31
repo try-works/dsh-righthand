@@ -6,7 +6,7 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
-The plugin also ships **blueprint guidance** — twenty named recipes for the agent-built tools this plugin exists to compose, eleven of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+The plugin also ships **blueprint guidance** — twenty-four named recipes for the agent-built tools this plugin exists to compose, fifteen of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
 
 ## Install
 
@@ -102,6 +102,10 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/agent-notebook` | Durable agent memory: `note:<slug>` records, prefix-scan recall, summarise-as-compaction, extract for structured recall |
 | `blueprint/credential-onboarding` | First-run checklist for the user's Cloudflare facts: describe gates, set never echoes, settings pin, one onboarding receipt |
 | `blueprint/budget-guard` | Expenses categorized by `rh_text_classify`, window sums by scan, cap in the store (not settings — the schema wall), warn at 80% |
+| `blueprint/price-watch` | Watch a product/flight/listing price: keyless adapter fetch, `rh_text_extract` the price, store history + target, notify once per crossing (Hermes product-price-monitor) |
+| `blueprint/document-action-plan` | Documents and meetings become plans that act: extract cited obligations, board tasks, schedule deadline reminders, deliver via ntfy (Hermes document/meeting-to-action-items) |
+| `blueprint/weekly-review` | The weekly reset: scan done/failed tasks, delivered events and receipts, synthesize, store a chained next-week plan (Hermes weekly-review-planning) |
+| `blueprint/pre-commit-gate` | Every change ships through the same gate: lint/typecheck/test/secret-scan via `rh_run`, one receipt per check, guard holds the ship step (Hermes requesting-code-review) |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |

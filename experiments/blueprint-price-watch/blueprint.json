@@ -1,0 +1,41 @@
+{
+  "name": "blueprint/price-watch",
+  "kind": "blueprint",
+  "description": "Watch a product, flight, or listing price and alert when it crosses a target (Hermes product-price-monitor, righthand-native): a keyless adapter fetches the listing, rh_text_extract pulls the price, the store keeps the history, and rh_notify_send fires once per crossing.",
+  "keywords": ["price", "watch", "monitor", "product", "flight", "listing", "threshold", "alert", "history"],
+  "use_cases": ["tell me when X drops below 200", "track a flight price over weeks", "price history of a listing", "one alert, not a barrage"],
+  "ingredients": [
+    "a keyless adapter per source (blueprint/data-adapter recipe: guardedFetch + normalize + fixture)",
+    "rh_text_extract to pull { price, currency, title } out of listing text",
+    "rh_store history under price:<slug>:<ts> and the target under price:<slug>:target",
+    "rh_notify_send for the crossing alert + a warn-once record"
+  ],
+  "recipe": "build the keyless fetcher for the source (recipe: probe -> fixture -> normalize) -> poll: fetch the listing -> rh_text_extract { price, currency } from the page text -> append price:<slug>:<ts> -> compare against price:<slug>:target -> on crossing, rh_notify_send once and record price:<slug>:alerted so the next poll does not re-fire -> history scan doubles as the trend",
+  "result_kind": "one store record per poll + one alert per threshold crossing",
+  "invoke_contract": {
+    "poll": "{ slug } -> { price, currency, at }",
+    "target": "{ slug, below: number } -> crossing = latest < below",
+    "history": "{ slug } -> { points: [{ price, at }] }"
+  },
+  "config_variants": {
+    "source": "keyless listing page | RSS | JSON endpoint (adapter per source)",
+    "alert": "once per crossing | every poll below target"
+  },
+  "cost_hint": "one model call per poll (extract); everything else free",
+  "pitfalls": [
+    "the adapter step is the data-adapter recipe - a source that needs an API token is out of scope",
+    "extract answers with a JSON Schema; parse failures are clean errors, not a wrong price",
+    "store the target next to the history (same slug) so a poll is one get + one put",
+    "warn-once needs its own record or every poll below target re-notifies",
+    "prices as numbers, times as ISO strings - JSON-serializable only",
+    "anti-bot walls are the real risk: probe the source first and record the UA/cookie requirements in the adapter's LEARNINGS"
+  ],
+  "local_limits": "polls only run when the agent runs - no server-side scheduler",
+  "cloud_limits": "cron escalation (documented) needs a Worker; same shape as reminder-flow/heartbeat",
+  "related": ["blueprint/data-adapter", "rh_text_extract", "rh_notify_send", "blueprint/heartbeat", "blueprint/budget-guard"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

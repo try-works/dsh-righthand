@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/weekly-review",
+  "kind": "blueprint",
+  "description": "The weekly reset (Hermes weekly-review-planning, righthand-native): scan what happened - done and failed tasks, delivered events, receipts - synthesize it with rh_text_summarise, and store the next-week plan as a note. The review is a build, not a memory.",
+  "keywords": ["weekly", "review", "reset", "retrospective", "commitments", "stalled", "plan", "summarise"],
+  "use_cases": ["what did I actually do this week", "what is stalled and why", "a one-page next-week plan", "keep the review durable across sessions"],
+  "ingredients": [
+    "rh_task_list (done + failed carry the week's evidence)",
+    "rh_events_list (delivered vs cancelled)",
+    "rh_store receipt scans (digest:, deploy:, uptime: ...)",
+    "rh_text_summarise for the synthesis + rh_store_put note:review:<week>"
+  ],
+  "recipe": "collect: rh_task_list state done + failed -> rh_events_list notified + cancelled -> scan receipt prefixes for the week -> synthesize: rh_text_summarise over the collected facts (what shipped, what stalled and why) -> plan: rh_text_summarise or hand-write the next-week commitments -> store: rh_store_put note:review:<week> { done, failed, delivered, plan, at } -> next review starts by reading the previous one",
+  "result_kind": "one review note per week, chained to the previous",
+  "invoke_contract": {
+    "collect": "window -> { doneTasks, failedTasks, events, receipts }",
+    "synthesize": "{ facts } -> { summary, stalled, plan }"
+  },
+  "config_variants": {
+    "synthesis": "rh_text_summarise | hand-written bullets",
+    "chain": "link to the previous review in the note"
+  },
+  "cost_hint": "one or two model calls per review; everything else free",
+  "pitfalls": [
+    "failed tasks are the review's gold - the result field says what was tried and what broke; done tasks alone flatter the week",
+    "cancelled events are news too - the record says what was retracted",
+    "chain the notes: each review reads the previous one's plan and answers it",
+    "the review is only as true as the receipts - if the week's work never wrote them, the review cannot see it",
+    "store the plan as a note, not a promise - next week's agent may be a fresh context"
+  ],
+  "local_limits": "sees only what rh_* tools recorded - invisible work stays invisible",
+  "cloud_limits": "same LLM config as the text family",
+  "related": ["rh_task_*", "rh_events_*", "rh_text_summarise", "blueprint/agent-notebook", "blueprint/governed-exec"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

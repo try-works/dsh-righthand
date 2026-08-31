@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/pre-commit-gate",
+  "kind": "blueprint",
+  "description": "Every change ships through the same gate (Hermes requesting-code-review, righthand-native): rh_run executes the check chain (lint, typecheck, tests, secret scan), the store keeps one receipt per run, the guard can deny the dangerous step, and ship-if-green is a rule, not a mood.",
+  "keywords": ["pre-commit", "gate", "lint", "typecheck", "test", "secret-scan", "review", "receipt", "ship"],
+  "use_cases": ["run the full check chain before a commit", "one receipt per change attempt", "deny a release unless the gate passed", "the diff between two gate runs is the review"],
+  "ingredients": [
+    "rh_run per check: pnpm lint, pnpm typecheck, pnpm test, secret-scan pattern (exit codes are the verdicts)",
+    "rh_store gate:<changeId>:<check> receipts { exitCode, tail, at }",
+    "guard rules (deny the release prefix until the receipts are green)",
+    "guardFactsFor + a golden for agent-built guards"
+  ],
+  "recipe": "run the chain: rh_run each check with bounded collect -> receipt per check -> all green: the gate passes and the receipt set IS the review evidence -> any red: the change stops, the failing tail goes into the receipt, and the fix loop reruns only the failed checks -> ship step runs behind a guard rule (ask or deny) that the receipts feed",
+  "result_kind": "one receipt per check per change, plus the guard verdict",
+  "invoke_contract": {
+    "check": "{ argv } -> { exitCode, ok, tail }",
+    "gate": "{ changeId } -> { checks: { lint, typecheck, test, scan }, green: boolean }"
+  },
+  "config_variants": {
+    "chain": "lint + typecheck + test + secret-scan (the plugin's own is this shape)",
+    "enforce": "receipts only | guard deny on red | guard ask with the receipts"
+  },
+  "cost_hint": "free (local subprocess + store)",
+  "pitfalls": [
+    "exit code is the verdict - a check that prints warnings and exits 0 is green, whatever the words say",
+    "rh_run is collect mode and bounded - keep tails short (last lines, not full logs)",
+    "the secret scan belongs IN the chain, before anything leaves the machine",
+    "receipts make the gate auditable: a red receipt is why the release did not happen",
+    "TDD fits the same loop: run the failing test first (red receipt), then the fix (green receipt)"
+  ],
+  "local_limits": "local checks only - no CI",
+  "cloud_limits": "the same chain runs in a Worker or CI on the user's own Cloudflare; the receipts move with it",
+  "related": ["rh_run", "guard-tools", "blueprint/governed-exec", "blueprint/heartbeat"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

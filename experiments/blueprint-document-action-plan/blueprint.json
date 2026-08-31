@@ -1,0 +1,40 @@
+{
+  "name": "blueprint/document-action-plan",
+  "kind": "blueprint",
+  "description": "Turn a document or meeting note into a plan that acts (Hermes document-to-action-items / meeting-action-items, righthand-native): rh_text_extract pulls cited obligations with owners and deadlines, each becomes a task AND a reminder, and the reminder delivers through ntfy when its time comes.",
+  "keywords": ["document", "meeting", "action-items", "obligations", "deadlines", "extract", "tasks", "reminders"],
+  "use_cases": ["what did this contract obligate us to do", "meeting notes to owners and tickets", "every deadline gets a reminder", "cited obligations, not vibes"],
+  "ingredients": [
+    "rh_text_extract with an obligations schema (cite + action + owner + deadline)",
+    "rh_task_create per action (typed board, open -> done/failed)",
+    "rh_events_create per deadline (the reminder bridge)",
+    "rh_events_due each turn + rh_notify_send for the delivery"
+  ],
+  "recipe": "extract: rh_text_extract { text, schema: { obligations: [{ cite, action, owner, deadline }] } } -> board: rh_task_create per obligation, the cite in the detail -> schedule: rh_events_create per deadline (at = the ISO deadline, title = the action) -> each turn rh_events_due returns what has come due and marks it notified -> rh_notify_send the due items -> when the task is done, cancel or complete both halves",
+  "result_kind": "one task + one event per obligation, receipts on delivery",
+  "invoke_contract": {
+    "extract": "{ text, schema } -> { obligations: [{ cite, action, owner, deadline }] }",
+    "board": "{ obligations } -> task ids",
+    "schedule": "{ obligations } -> event ids"
+  },
+  "config_variants": {
+    "source": "contract | meeting transcript | email thread",
+    "delivery": "ntfy (defaultNotifyTopic) | receipts only"
+  },
+  "cost_hint": "one model call per extraction; tasks/events/notify free",
+  "pitfalls": [
+    "every obligation keeps its cite - an action without the sentence that spawned it is unfalsifiable",
+    "extract is schema-in, object-out; a malformed deadline fails the call cleanly, do not half-board",
+    "the task and the event are two halves: the board tracks the work, the event delivers the interruption - complete both",
+    "due marks notified at return time: exactly-once delivery is the state flip, not caller discipline",
+    "the model hallucinating an obligation is the failure mode - the cite is what lets the user check"
+  ],
+  "local_limits": "reminders fire only on turns the agent runs",
+  "cloud_limits": "cron escalation for the due check (documented); the extraction stays a single LLM call",
+  "related": ["rh_text_extract", "rh_task_*", "rh_events_*", "rh_notify_send", "blueprint/task-triage", "blueprint/reminder-flow"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}
