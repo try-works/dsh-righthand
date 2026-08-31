@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/company-watch",
+  "kind": "blueprint",
+  "description": "Watch named companies for material news: keyless sources feed a rolling window, rh_text_extract pulls mention + claim triples, rh_text_summarise composes the digest, notify fires only on material change.",
+  "hermes_source": "research/competitor-news-monitor",
+  "keywords": ["competitor", "company", "news", "monitor", "mentions", "rolling", "digest"],
+  "use_cases": ["what changed about X this week", "alert on material news", "a rolling mention window"],
+  "ingredients": ["keyless sources (RSS/JSON, daily-digest pattern)", "rh_text_extract mention triples { company, claim, date }", "rh_store window under watch:<company>:<ts>", "rh_text_summarise + rh_notify_send (alert-once)"],
+  "recipe": "fetch the sources -> extract { company, claim, date } triples -> append watch:<company>:<ts> -> diff the window against the previous digest -> material = new claim or tone shift -> summarise + notify once + store the digest",
+  "result_kind": "rolling window records + one digest per material change",
+  "cost_hint": "one model call per source batch; sources keyless",
+  "pitfalls": ["material means a NEW claim - repetition is not news", "alert-once needs its own record (watch:<company>:alerted)", "the same source can 403 - the blocked-page-recovery ladder applies", "keep the window capped; the rolling scan is the trend"],
+  "related": ["rh_store_*", "rh_run"]
+}

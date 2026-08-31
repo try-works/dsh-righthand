@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/codebase-audit",
+  "kind": "blueprint",
+  "description": "Inspect a codebase with numbers: rh_run the metric tools (pygount/cloc/git), keep one receipt per measure, summarize the shape, and store the report - the audit is a build, not a vibe.",
+  "hermes_source": "software-development/codebase-inspection",
+  "keywords": ["codebase", "audit", "loc", "metrics", "inspection", "report"],
+  "use_cases": ["how big is this repo", "which language dominates", "a snapshot to diff against next month"],
+  "ingredients": ["rh_run pygount / cloc / git log stats", "rh_store audit:<repo>:<ts> receipts", "rh_text_summarise the shape note"],
+  "recipe": "run the metric commands (bounded collect) -> receipt per measure -> summarize: languages, LOC, ratios, churn -> store audit:<repo>:<ts> { measures, note } -> diff against the previous snapshot",
+  "result_kind": "one audit record per repo per run, diffable",
+  "cost_hint": "free (local commands + one optional summarise)",
+  "pitfalls": ["exit code is the verdict - a missing tool is a red receipt, not a guess", "receipts are per measure, so a partial run is still evidence", "the snapshot only means something next to the previous one", "keep tails short - the summary is the deliverable"],
+  "related": ["rh_store_*", "rh_run"]
+}

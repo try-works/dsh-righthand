@@ -33,6 +33,16 @@ experiments/blueprint-daily-digest/cloud/.wrangler/
 !experiments/blueprint-document-action-plan/
 !experiments/blueprint-weekly-review/
 !experiments/blueprint-pre-commit-gate/
+!experiments/blueprint-blocked-page-recovery/
+!experiments/blueprint-paper-digest/
+!experiments/blueprint-company-watch/
+!experiments/blueprint-citation-trail/
+!experiments/blueprint-inbox-triage/
+!experiments/blueprint-codebase-audit/
+!experiments/blueprint-dogfood-session/
+!experiments/blueprint-debug-loop/
+!experiments/blueprint-artifact-publish/
+!experiments/blueprint-delegate-cli-coder/
 
 # Never commit secrets or the npm token file
 *.token.txt

@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/inbox-triage",
+  "kind": "blueprint",
+  "description": "Triage any inbox of text items: classify priority, extract the ask, board follow-ups as tasks, schedule the time-sensitive ones as reminders, and draft the reply yourself - the tools prioritize, you write.",
+  "hermes_source": "email/email-inbox-triage",
+  "keywords": ["inbox", "triage", "priority", "follow-up", "reply", "email"],
+  "use_cases": ["a pile of messages to sort", "which ones need a reply today", "schedule the time-sensitive asks"],
+  "ingredients": ["rh_store inbox:<ts> items", "rh_text_classify priority labels (urgent/respond/later/ignore)", "rh_text_extract { sender, ask, deadline }", "rh_task_create follow-ups + rh_events_create deadlines"],
+  "recipe": "capture -> classify priority -> extract the ask -> urgent: task + reply now; respond: task; time-sensitive: task + event at the deadline; later/ignore: receipt only -> work the board oldest-open",
+  "result_kind": "priority labels + one task per actionable item + events for deadlines",
+  "cost_hint": "two model calls per item (classify + extract)",
+  "pitfalls": ["classify is verbatim-label - closed priority set", "the reply is yours to write; the tools never draft on your behalf", "schedule the deadline as an event, not a task detail", "ignore is a decision too - record it"],
+  "related": ["rh_store_*", "rh_run"]
+}

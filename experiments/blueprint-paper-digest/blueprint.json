@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/paper-digest",
+  "kind": "blueprint",
+  "description": "A keyless arXiv digest: the data-adapter recipe wraps the Atom API (live-probed 200, no key), rh_text_summarise condenses abstracts, the store keeps the rolling window, notify delivers.",
+  "hermes_source": "research/arxiv",
+  "keywords": ["arxiv", "papers", "digest", "atom", "xml", "abstract", "research"],
+  "use_cases": ["new papers on a topic", "condense abstracts", "a weekly research digest", "track an author"],
+  "ingredients": ["keyless adapter: export.arxiv.org/api/query (Atom XML, live-probed)", "XML parse (the files-tools parseListXml precedent)", "rh_text_summarise per abstract", "rh_store window + rh_notify_send"],
+  "recipe": "probe -> fixture -> parse the Atom entries (title, summary, published, authors, abs link) -> rh_text_summarise each abstract to one sentence -> store digest:<query>:<date> { entries } -> notify once -> next run diffs by id",
+  "result_kind": "one digest record per query per day, diffable by id",
+  "cost_hint": "one model call per abstract; the API is free",
+  "pitfalls": ["the API answers Atom XML, not JSON - parse entries, not a body object", "redirect hop: export.arxiv.org -> arxiv.org/api (guardedFetch revalidates it)", "query syntax is search_query=all:term; sort by submittedDate desc", "summarise abstracts, do not re-rank the feed - say which you kept", "diff by arxiv id to report only new papers"],
+  "related": ["rh_store_*", "rh_run"]
+}

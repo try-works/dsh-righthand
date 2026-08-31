@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/debug-loop",
+  "kind": "blueprint",
+  "description": "The 4-phase root-cause loop: reproduce (rh_run), gather evidence (store), hypothesize (extract the symptom facts), fix, verify (rh_run again). Every phase leaves a receipt - understand before fixing.",
+  "hermes_source": "software-development/systematic-debugging",
+  "keywords": ["debug", "root-cause", "repro", "evidence", "hypothesis", "verify"],
+  "use_cases": ["a failing build", "a flaky test", "understand before touching code"],
+  "ingredients": ["rh_run to reproduce and verify (exit codes verbatim)", "rh_store debug:<bugId>:<phase> receipts", "rh_text_extract symptom facts { symptom, trigger, error }"],
+  "recipe": "reproduce: rh_run the failing command, capture exit + tail -> evidence: store the exact output -> hypothesize: extract { symptom, trigger, error } from the evidence -> fix -> verify: rerun until green -> every phase a receipt, the fix summary stored on the record",
+  "result_kind": "one receipt per phase + the fix summary on the bug record",
+  "cost_hint": "one extract per hypothesis; runs free",
+  "pitfalls": ["the failing tail is the evidence - never truncate it away", "one hypothesis per fix; receipts show which one worked", "verify with the SAME command that reproduced", "exit codes are verbatim - do not reword the failure"],
+  "related": ["rh_store_*", "rh_run"]
+}

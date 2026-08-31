@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/blocked-page-recovery",
+  "kind": "blueprint",
+  "description": "The escalation ladder when a fetch fails: 403/429, WAF, paywall, bot wall. Documented as a decision chain over the guardedFetch learnings this repo already earned the hard way.",
+  "hermes_source": "web/blocked-page-recovery",
+  "keywords": ["403", "429", "paywall", "waf", "bot-wall", "rss", "fallback", "backoff"],
+  "use_cases": ["a source answers 403", "rate-limited mid-run", "paywalled page", "selector drift"],
+  "ingredients": ["guardedFetch (SSRF checklist + redirect revalidation)", "rh_store attempt receipts", "rh_text_summarise for paywall abstracts", "browser tools as the final escalation"],
+  "recipe": "fetch fails -> record the failure (code + url + at) -> ladder: retry with backoff (429) -> browser User-Agent (Reddit JSON 403 -> RSS works) -> Accept header fixes -> different endpoint of the same source (HN HTML -> Algolia JSON) -> archive/mirror -> browser tools -> give up with the receipt",
+  "result_kind": "one attempt receipt per rung + the recovered text or a clean give-up",
+  "cost_hint": "free until the browser-tools rung",
+  "pitfalls": ["retry BEFORE switching source - a 429 is not a 403", "record each rung: the receipt is what makes the ladder auditable", "probe selector/markup before parsing - HN dropped titlelink", "Cloudflare egress can 503 a feed that a browser UA does not (Google News RSS)", "paywalls are not a technical wall - summarize what is visible, do not fabricate"],
+  "related": ["rh_store_*", "rh_run"]
+}

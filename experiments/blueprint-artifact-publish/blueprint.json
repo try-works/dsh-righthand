@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/artifact-publish",
+  "kind": "blueprint",
+  "description": "Build an artifact (page, diagram, sketch), publish it to R2 with rh_files_put, share it with a presigned URL, and notify - the render-to-share pipeline for anything the agent makes.",
+  "hermes_source": "creative/claude-design, popular-web-designs, architecture-diagram, p5js",
+  "keywords": ["artifact", "publish", "r2", "presign", "share", "render", "diagram"],
+  "use_cases": ["share a generated page", "publish a diagram", "a link the user can open"],
+  "ingredients": ["rh_run to render/build the artifact (local tools)", "rh_files_put + rh_store index record", "rh_files_share presigned URL", "rh_notify_send the link"],
+  "recipe": "render the artifact with rh_run (exit 0 = it exists) -> rh_files_put with the right contentType -> index record in the store { contentType, size, at } -> rh_files_share for the time-boxed link -> notify the link -> the URL is a secret for its window",
+  "result_kind": "one R2 object + index record + presigned link",
+  "cost_hint": "R2 storage on the user's account; rendering local",
+  "pitfalls": ["the presigned URL expires - share it, then it is gone", "set contentType at put time or the browser renders it wrong", "index record beside the blob (file-vault pattern)", "rh_run verifies the artifact exists before put - exit 0 is the gate"],
+  "related": ["rh_store_*", "rh_run"]
+}

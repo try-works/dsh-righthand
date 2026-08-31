@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/citation-trail",
+  "kind": "blueprint",
+  "description": "Every claim carries its source: rh_text_extract pulls claim+citation triples from the working text, the store keeps the trail, and the agent asserts only what the trail supports.",
+  "hermes_source": "research/grounded-citations",
+  "keywords": ["citations", "grounding", "claims", "sources", "verifiable", "trail"],
+  "use_cases": ["ground an answer", "audit which claim came from where", "draft with inline cites"],
+  "ingredients": ["rh_text_extract with a claim schema { claim, source, quote }", "rh_store trail:<docId>:<n> records", "the agent asserts only trailed claims"],
+  "recipe": "working text -> extract { claim, source, quote } triples -> store one record per triple -> compose the answer from trailed claims only -> a claim without a record is flagged, not asserted",
+  "result_kind": "one store record per claim + a source list per answer",
+  "cost_hint": "one model call per extraction",
+  "pitfalls": ["the quote is the check - a cite without a quote is unfalsifiable", "extract fails clean on malformed input - never assert on a partial parse", "dedupe identical claims before storing", "the trail is per answer, not global - store it beside the answer"],
+  "related": ["rh_store_*", "rh_run"]
+}

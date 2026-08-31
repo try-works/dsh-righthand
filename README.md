@@ -6,7 +6,7 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
-The plugin also ships **blueprint guidance** — twenty-four named recipes for the agent-built tools this plugin exists to compose, fifteen of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+The plugin also ships **blueprint guidance** — thirty-four named recipes for the agent-built tools this plugin exists to compose, twenty-five of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
 
 ## Install
 
@@ -106,6 +106,16 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/document-action-plan` | Documents and meetings become plans that act: extract cited obligations, board tasks, schedule deadline reminders, deliver via ntfy (Hermes document/meeting-to-action-items) |
 | `blueprint/weekly-review` | The weekly reset: scan done/failed tasks, delivered events and receipts, synthesize, store a chained next-week plan (Hermes weekly-review-planning) |
 | `blueprint/pre-commit-gate` | Every change ships through the same gate: lint/typecheck/test/secret-scan via `rh_run`, one receipt per check, guard holds the ship step (Hermes requesting-code-review) |
+| `blueprint/blocked-page-recovery` | The escalation ladder when a fetch fails — backoff, browser UA, header fixes, alternate endpoint, browser tools, clean give-up (Hermes blocked-page-recovery) |
+| `blueprint/paper-digest` | Keyless arXiv digest: Atom API adapter (live-probed), abstract summarising, rolling store window, diff-by-id (Hermes arxiv) |
+| `blueprint/company-watch` | Watch named companies for material news: keyless sources, extracted mention triples, rolling window, alert on new claims only (Hermes competitor-news-monitor) |
+| `blueprint/citation-trail` | Every claim carries its source: extract claim/source/quote triples, store the trail, assert only trailed claims (Hermes grounded-citations) |
+| `blueprint/inbox-triage` | Triage any inbox: closed priority labels, extracted asks, follow-up tasks + deadline events, ignore recorded too (Hermes email-inbox-triage) |
+| `blueprint/codebase-audit` | Inspect a repo with numbers: metric commands via `rh_run`, per-measure receipts, a shape note, diffable snapshots (Hermes codebase-inspection) |
+| `blueprint/dogfood-session` | Exploratory QA of your own app: evidence per finding (steps/expected/actual), severity labels, one session report (Hermes dogfood) |
+| `blueprint/debug-loop` | The 4-phase root-cause loop — reproduce, evidence, hypothesize, verify — every phase a receipt (Hermes systematic-debugging) |
+| `blueprint/artifact-publish` | Render an artifact, publish to R2, index it, share a presigned link, notify (Hermes claude-design / architecture-diagram / p5js et al) |
+| `blueprint/delegate-cli-coder` | Delegate a bounded coding task to a CLI coder: brief, guard-gated invoke, receipts, diff reviewed by the pre-commit gate (Hermes claude-code / codex / opencode) |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |

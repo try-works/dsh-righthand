@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/dogfood-session",
+  "kind": "blueprint",
+  "description": "Exploratory QA of your own app: drive it, capture evidence per finding (steps + actual vs expected), store the session, and emit one bug report - repro wins over opinion.",
+  "hermes_source": "software-development/dogfood",
+  "keywords": ["dogfood", "qa", "bugs", "evidence", "repro", "report"],
+  "use_cases": ["find bugs before users do", "a written repro per finding", "track the session for the weekly review"],
+  "ingredients": ["browser tools / rh_run curl for the poking", "rh_store dogfood:<session>:<n> evidence records { steps, expected, actual }", "rh_text_summarise the session report", "rh_notify_send when a blocker-level bug is found"],
+  "recipe": "open the app -> for each finding: record steps + expected + actual -> severity via rh_text_classify (blocker/major/minor/nit) -> session summary via rh_text_summarise -> blocker: notify once -> the records feed the weekly review",
+  "result_kind": "one evidence record per finding + one session report",
+  "cost_hint": "one classify per finding + one summarise per session",
+  "pitfalls": ["actual vs expected is the evidence - opinion is not", "record steps BEFORE the fix, or the repro evaporates", "severity labels closed set, verbatim", "blocker alert needs an alert-once record"],
+  "related": ["rh_store_*", "rh_run"]
+}

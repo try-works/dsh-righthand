@@ -1,0 +1,14 @@
+{
+  "name": "blueprint/delegate-cli-coder",
+  "kind": "blueprint",
+  "description": "Delegate a bounded coding task to a CLI coder: rh_run (or rh_run_bg for long runs) invokes it with one written brief, receipts record the run, and the pre-commit-gate reviews the diff before it ships.",
+  "hermes_source": "autonomous-ai-agents/claude-code, codex, opencode",
+  "keywords": ["delegate", "cli", "coder", "claude-code", "codex", "brief", "receipt"],
+  "use_cases": ["a feature to a CLI coder", "a bounded refactor", "review before merge"],
+  "ingredients": ["rh_run / rh_run_bg for the CLI invocation", "rh_store delegate:<taskId> brief + receipts", "pre-commit-gate for the diff review", "guard ask on the invoke step"],
+  "recipe": "write the brief (bounded task, one outcome) -> guard-gate the invoke -> rh_run the CLI coder with the brief -> receipt: exit code + tail -> review: run the pre-commit-gate chain on the diff -> red: loop with a follow-up brief; green: merge receipt",
+  "result_kind": "brief + run receipt + gate receipts per task",
+  "cost_hint": "the CLI coder's own cost; everything else local",
+  "pitfalls": ["the brief is the contract - one outcome per task", "long runs belong to rh_run_bg (status only - poll, do not wait)", "the gate reviews the DIFF, not the run output", "guard ask on invoke keeps delegation a decision, not a reflex"],
+  "related": ["rh_store_*", "rh_run"]
+}
