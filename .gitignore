@@ -24,6 +24,11 @@ experiments/blueprint-daily-digest/cloud/.wrangler/
 !experiments/blueprint-geo-context/
 !experiments/blueprint-governed-exec/
 !experiments/blueprint-file-vault/
+!experiments/blueprint-task-triage/
+!experiments/blueprint-heartbeat/
+!experiments/blueprint-agent-notebook/
+!experiments/blueprint-credential-onboarding/
+!experiments/blueprint-budget-guard/
 
 # Never commit secrets or the npm token file
 *.token.txt

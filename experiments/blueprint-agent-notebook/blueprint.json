@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/agent-notebook",
+  "kind": "blueprint",
+  "description": "Durable agent memory over the store: notes under note:<slug>, recall by prefix scan, and LLM escalation only where it pays - rh_text_summarise to compact a long note, rh_text_extract to pull structured bits out of prose. The notes pattern from the catalogue, made a routine.",
+  "keywords": ["notes", "memory", "notebook", "recall", "summarise", "compact", "durable", "store"],
+  "use_cases": ["remember a decision across turns", "compact a long note", "pull dates and names out of prose", "search my own notes by prefix"],
+  "ingredients": [
+    "rh_store_put / rh_store_get / rh_store_list / rh_store_delete (note:<slug> keys)",
+    "rh_text_summarise (compaction escalation)",
+    "rh_text_extract (structured recall: dates, names, amounts)"
+  ],
+  "recipe": "write: rh_store_put note:<slug> { text, tags, at } -> read: rh_store_get by slug -> scan: rh_store_list + prefix filter is the search -> compact: when a note grows past a cap, rh_text_summarise and store the short form alongside (keep the original) -> structured recall: rh_text_extract with a schema over one or more notes",
+  "result_kind": "one store record per note, optional summary field",
+  "invoke_contract": {
+    "write": "{ slug, text, tags? } -> { key, updatedAt, writes }",
+    "recall": "{ slug } -> { found, value } | { found: false }",
+    "compact": "{ slug } -> summary appended, original kept"
+  },
+  "config_variants": {
+    "compaction": "none | manual | over-cap auto (summarise)",
+    "structure": "free prose | extract-on-recall with a fixed schema"
+  },
+  "cost_hint": "free until compaction; one model call per summarise/extract",
+  "pitfalls": [
+    "absence is { found: false } - the exists() check, not an error",
+    "the prefix IS the search: note:project:* enumerates a project; pick slugs that sort well",
+    "summarise compacts but never replaces the original - keep the full text as the source of truth",
+    "extract needs a JSON Schema and returns one conforming object - parse failures are clean errors",
+    "values must be JSON-serializable - no Dates, no functions, ISO strings only"
+  ],
+  "local_limits": "search is prefix-scan only - no free-text search without building an index",
+  "cloud_limits": "store domain is the harness's; a Cloudflare KV index is the documented escalation for free-text search",
+  "related": ["rh_store_*", "rh_text_*", "blueprint/task-triage", "docs/scenario-patterns.md"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

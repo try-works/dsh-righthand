@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/heartbeat",
+  "kind": "blueprint",
+  "description": "The uptime pattern generalized: rh_run performs a check, the store keeps one receipt per run, success-rate is a scan, and rh_notify_send interrupts you when N checks in a row fail. Escalation is Cloudflare cron (documented, not built).",
+  "keywords": ["uptime", "heartbeat", "ping", "healthcheck", "monitor", "alert", "notify", "receipt"],
+  "use_cases": ["is the site up", "success rate over a week", "ping me when it has been down 3 times", "health check after a deploy"],
+  "ingredients": [
+    "rh_run (collect mode: exit code + bounded stdout/stderr - live-verified)",
+    "rh_store receipts under uptime:<ts> or smoke:<service>:<ts>",
+    "rh_notify_send for the alert (ntfy.sh, keyless)",
+    "rh_run_bg for checks that must not block the turn"
+  ],
+  "recipe": "check: rh_run curl -sI (or any probe command) -> receipt: rh_store_put { ok: exitCode === 0, ms, at } -> scan: rh_store_list uptime:* + get the last N -> aggregate the success rate -> alert: when the last N consecutive receipts are failures, rh_notify_send once (record the sent alert so it is not repeated)",
+  "result_kind": "one receipt per check + one alert per failure streak",
+  "invoke_contract": {
+    "check": "{ argv } -> { exitCode, ok, ms }",
+    "scan": "prefix uptime: -> { total, ok, successRate }"
+  },
+  "config_variants": {
+    "cadence": "on-demand (agent runs the check) | cron escalation",
+    "alert": "none | notify on streak | notify on every failure"
+  },
+  "cost_hint": "free (local subprocess + store + keyless ntfy)",
+  "pitfalls": [
+    "rh_run is collect mode and bounded - keep probe output small (headers, not bodies)",
+    "rh_run_bg reports status/exit but NOT captured stdout (live-verified) - use rh_run when the answer is the output",
+    "alert-once needs its own record (alert:uptime:<ts>): without it every turn re-alerts",
+    "exit codes and stderr surface exactly as the command produced them - a curl timeout is exit 28, not a thrown error",
+    "argv arrays only - no shell pipes; curl -sI and curl -sf are the shell-free forms"
+  ],
+  "local_limits": "checks only run on turns the agent actually runs",
+  "cloud_limits": "cron escalation needs a Worker + the user's Cloudflare account; not a built primitive",
+  "related": ["rh_run", "rh_run_bg", "rh_notify_send", "blueprint/reminder-flow", "blueprint/governed-exec"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

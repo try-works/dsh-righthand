@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/task-triage",
+  "kind": "blueprint",
+  "description": "Turn an unstructured inbox into a task board: rh_text_classify sorts items into your labels, rh_text_extract pulls the structured fields, rh_task_create boards them, rh_task_next drives the work loop, and a failed task records what went wrong instead of going quiet.",
+  "keywords": ["tasks", "triage", "classify", "extract", "inbox", "board", "next", "state-machine"],
+  "use_cases": ["triage an inbox", "extract a due date from text", "what should I work on now", "a task that failed must say why"],
+  "ingredients": [
+    "rh_task_create / rh_task_list / rh_task_next / rh_task_update / rh_task_delete (typed domain, open -> done/failed)",
+    "rh_text_classify / rh_text_extract / rh_text_summarise (ctx.llm, one call per verb)",
+    "rh_store for the inbox items before they are boarded"
+  ],
+  "recipe": "capture items under inbox: -> rh_text_classify into your label set -> rh_text_extract the structured fields (due, amount, owner) -> rh_task_create one task per item -> work loop: rh_task_next returns the oldest open task -> finish with rh_task_update state done, or failed with a result saying what was tried and what broke -> weekly: rh_text_summarise over done tasks for the report",
+  "result_kind": "task board (open -> done/failed) plus one summary per review",
+  "invoke_contract": {
+    "classify": "{ text, labels[] } -> { label, confidence }",
+    "extract": "{ text, schema } -> one object conforming to the schema",
+    "board": "{ title, detail, result? } -> task id (t-...)"
+  },
+  "config_variants": {
+    "labels": "fixed set per project (bug/feature/question...)",
+    "model": "text family config provider/model, default harness default"
+  },
+  "cost_hint": "one model call per verb (classify/extract/summarise); tasks and store are free",
+  "pitfalls": [
+    "classify returns a label VERBATIM from your set plus 0-1 confidence - a label outside the set is an error, not a guess",
+    "extract takes a JSON Schema; parse failures surface as a clean error, never raw prose",
+    "rh_task_next is the oldest open task - the work loop is deterministic, not a choice",
+    "a task that cannot run is still recorded: update it failed with a result, never delete the evidence",
+    "each verb is one contained model call - one failure does not take down the others"
+  ],
+  "local_limits": "the LLM is the harness default unless the text family config says otherwise",
+  "cloud_limits": "same text family on the user's own Cloudflare account if the model provider is theirs",
+  "related": ["rh_task_*", "rh_text_*", "blueprint/agent-notebook", "blueprint/governed-exec"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

@@ -6,7 +6,7 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
-The plugin also ships **blueprint guidance** — fifteen named recipes for the agent-built tools this plugin exists to compose, six of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+The plugin also ships **blueprint guidance** — twenty named recipes for the agent-built tools this plugin exists to compose, eleven of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
 
 ## Install
 
@@ -97,6 +97,11 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/geo-context` | A place query becomes agent context: geocode, then elevation + weather + air + nearby at those coordinates, TTL-cached in `rh_store` |
 | `blueprint/governed-exec` | Every high-impact command as a governed, receipted step: guard gates the prefix, `rh_run` collects, the store keeps the before/after undo trail |
 | `blueprint/file-vault` | R2 as the agent's file system with the store as the index: `rh_files_*` blobs + metadata records + time-boxed presigned shares |
+| `blueprint/task-triage` | An unstructured inbox becomes a task board: classify + extract + board, oldest-open work loop, failed tasks record why |
+| `blueprint/heartbeat` | The uptime pattern generalized: `rh_run` checks, `uptime:*` receipts, success-rate scans, notify once per failure streak |
+| `blueprint/agent-notebook` | Durable agent memory: `note:<slug>` records, prefix-scan recall, summarise-as-compaction, extract for structured recall |
+| `blueprint/credential-onboarding` | First-run checklist for the user's Cloudflare facts: describe gates, set never echoes, settings pin, one onboarding receipt |
+| `blueprint/budget-guard` | Expenses categorized by `rh_text_classify`, window sums by scan, cap in the store (not settings — the schema wall), warn at 80% |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |

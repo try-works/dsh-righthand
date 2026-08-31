@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/budget-guard",
+  "kind": "blueprint",
+  "description": "A personal budget with an LLM categorizer: expense receipts in the store, rh_text_classify sorts each one into your categories, the cap lives in rh_store (NOT settings - the schema wall), and rh_notify_send warns before the cap, not after.",
+  "keywords": ["budget", "expenses", "classify", "categories", "cap", "alert", "spending", "receipts"],
+  "use_cases": ["log an expense with a category", "sum this week's spending", "warn me at 80 percent of the cap", "categorize a pile of transactions"],
+  "ingredients": [
+    "rh_store_put expense:<ts> { amount, category, note } and budget:cap { value }",
+    "rh_text_classify (verbatim label + confidence)",
+    "rh_notify_send for the near-cap warning",
+    "rh_store_list + rh_store_get for the window sum"
+  ],
+  "recipe": "log: rh_store_put expense:<ts> { amount, note } -> categorize: rh_text_classify { text: note, labels: [food, transport, home, other] } -> overwrite with the category -> sum: scan expense:* for the window and add amounts -> cap: read budget:cap from the STORE (unregistered settings keys vanish - live-verified) -> warn: at 80 percent, rh_notify_send once (record the sent warning so it is not repeated)",
+  "result_kind": "dated expense records + one cap record + one warning per threshold crossing",
+  "invoke_contract": {
+    "log": "{ amount, note } -> { key, category?, writes }",
+    "sum": "window -> { total, byCategory, cap, pct }"
+  },
+  "config_variants": {
+    "categories": "fixed label set per household",
+    "alert": "none | 80 percent | 100 percent"
+  },
+  "cost_hint": "one model call per uncategorized expense; everything else free",
+  "pitfalls": [
+    "keep the cap in rh_store, not rh_settings: set accepted an unregistered key and get never returned it (live-verified schema wall)",
+    "classify answers with a label VERBATIM from the set - anything else is an error",
+    "sums are a scan: list the window prefix and add - there is no query language",
+    "warn-once needs its own record (budget:warned:<ts>) or every turn re-warns",
+    "amounts as numbers, categories as strings - JSON-serializable only"
+  ],
+  "local_limits": "no real currency conversion - amounts are whatever unit you log",
+  "cloud_limits": "a markets adapter (keyless rates) is the documented escalation for multi-currency",
+  "related": ["rh_store_*", "rh_text_classify", "rh_notify_send", "blueprint/task-triage", "blueprint/heartbeat"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

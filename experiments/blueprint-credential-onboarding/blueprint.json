@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/credential-onboarding",
+  "kind": "blueprint",
+  "description": "The first-run flow for the user's own Cloudflare facts: rh_credential_describe is the auth gate, rh_credential_set stores what is missing (never echoing it), rh_settings_get/set pins the account facts, and one store receipt records the onboarded state. Every Cloudflare scenario starts here.",
+  "keywords": ["credentials", "onboarding", "auth", "gate", "settings", "cloudflare", "account", "setup"],
+  "use_cases": ["first run before any files/deploy tool", "is the API token set", "record what was configured when", "re-onboard after a token rotation"],
+  "ingredients": [
+    "rh_credential_describe / rh_credential_set / rh_credential_unset (values never echoed)",
+    "rh_settings_get / rh_settings_set (namespace righthand)",
+    "rh_store receipt: onboarding:<ts> { refs: { ref: configured }, at }"
+  ],
+  "recipe": "gate: describe each ref the task needs (CLOUDFLARE_API_TOKEN, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY) -> stop and tell the user which are missing (configured:false is actionable) -> set the missing ones through the supervised flow - the agent never sees the value, only { stored: true } -> pin the account facts: rh_settings_set { accountId, defaultZone, defaultR2Bucket } -> receipt: store the onboarded state with a timestamp",
+  "result_kind": "configured credentials + settings + one onboarding receipt",
+  "invoke_contract": {
+    "describe": "{ ref } -> { configured, source, writable }",
+    "set": "{ ref, value } -> { stored: true } (value never comes back)",
+    "receipt": "{ refs, at } -> store record"
+  },
+  "config_variants": {
+    "refs": "per task (files needs R2 keys, deploy needs the API token)",
+    "settings": "schema keys only - the wall applies (below)"
+  },
+  "cost_hint": "free",
+  "pitfalls": [
+    "describe is the gate and the value never appears in any output - assert that in tests",
+    "set returns { stored: true } only - the secret flows one way",
+    "the settings schema wall: unregistered keys are accepted by set but never returned by get (live-verified) - only schema keys belong in settings",
+    "references are POSIX env-var style uppercase names",
+    "a rotated token is an unset + set, and the receipt makes the rotation a fact"
+  ],
+  "local_limits": "credentials live in the harness credential provider, not the repo - never commit them",
+  "cloud_limits": "the user's own Cloudflare account; the onboarding gate is what keeps deploy scenarios safe to even start",
+  "related": ["rh_credential_*", "rh_settings_*", "blueprint/file-vault", "blueprint/governed-exec", "blueprint/heartbeat"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}
