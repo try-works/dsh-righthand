@@ -28,6 +28,7 @@ export const righthandSettingsSchema = z.object({
   defaultScriptPrefix: z.string().default('rh-'),
   defaultZone: z.string().default(''),
   defaultR2Bucket: z.string().default(''),
+  defaultNotifyTopic: z.string().default(''),
 })
 
 /** Register the settings namespace + the secret/credential tools. */
@@ -120,7 +121,7 @@ export function apply(ctx: Context): void {
     },
     async execute() {
       const v = scope.get()
-      return { accountId: v.accountId, defaultScriptPrefix: v.defaultScriptPrefix, defaultZone: v.defaultZone, defaultR2Bucket: v.defaultR2Bucket }
+      return { accountId: v.accountId, defaultScriptPrefix: v.defaultScriptPrefix, defaultZone: v.defaultZone, defaultR2Bucket: v.defaultR2Bucket, defaultNotifyTopic: v.defaultNotifyTopic }
     },
   }))
 

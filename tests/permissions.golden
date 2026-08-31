@@ -1,11 +1,17 @@
 rh_credential_describe      destructive=false mode=none
 rh_credential_set           destructive=true mode=ask
 rh_credential_unset         destructive=false mode=none
+rh_events_cancel            destructive=false mode=none
+rh_events_create            destructive=false mode=none
+rh_events_due               destructive=false mode=none
+rh_events_free              destructive=false mode=none
+rh_events_list              destructive=false mode=none
 rh_files_delete             destructive=false mode=none
 rh_files_get                destructive=false mode=none
 rh_files_list               destructive=false mode=none
 rh_files_put                destructive=false mode=none
 rh_files_share              destructive=false mode=none
+rh_notify_send              destructive=false mode=none
 rh_run                      destructive=false mode=allow
 rh_run_bg                   destructive=false mode=allow
 rh_settings_get             destructive=false mode=none

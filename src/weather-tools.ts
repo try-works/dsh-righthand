@@ -65,9 +65,15 @@ export function isBlockedIP(ip: string): boolean {
  * Fetch one URL with the SSRF checklist. `fetchImpl` and `resolve` are
  * injectable for tests; production uses the globals.
  */
+export interface GuardedFetchInit {
+  method?: string
+  body?: string
+  headers?: Record<string, string>
+}
+
 export async function guardedFetch(
   url: string,
-  deps: { fetchImpl?: typeof fetch; resolve?: (host: string) => Promise<string[]> } = {},
+  deps: { fetchImpl?: typeof fetch; resolve?: (host: string) => Promise<string[]>; init?: GuardedFetchInit } = {},
 ): Promise<string> {
   const fetchImpl = deps.fetchImpl ?? fetch
   const resolve = deps.resolve ?? (async (host: string) => (await lookup(host, { all: true })).map(a => a.address))
@@ -78,7 +84,7 @@ export async function guardedFetch(
     if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') throw new Error('blocked: non-http(s) URL')
     const ips = await resolve(parsed.hostname)
     if (ips.length === 0 || ips.some(isBlockedIP)) throw new Error('blocked: destination is not a public host')
-    const res = await fetchImpl(current, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), redirect: 'manual' })
+    const res = await fetchImpl(current, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), redirect: 'manual', method: deps.init?.method ?? 'GET', body: deps.init?.body, headers: deps.init?.headers })
     if (res.status >= 300 && res.status < 400) {
       const next = res.headers.get('location')
       if (next === null) throw new Error('blocked: redirect without location')

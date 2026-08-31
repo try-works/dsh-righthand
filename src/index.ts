@@ -8,8 +8,10 @@
  * The package's plugin entry (name/inject/apply) mounts the tool families
  * and the packaged skill as child fibers; each child waits on its own
  * services, so a
- * profile without `storageDomain` (e.g. headless) simply gets the other
- * seven tools instead of failing the boot.
+ * profile without `storageDomain` (e.g. headless) simply gets the
+ * store/task/events families dormant and the other nineteen tools
+ * (secrets, settings, exec, text, weather, files, notify) instead of
+ * failing the boot.
  *
  * Modules (each individually mountable via `export * as ...`):
  * - store-tools:     rh_store_put/get/delete/list over ctx.storageDomain
@@ -18,6 +20,8 @@
  * - text-tools:      rh_text_summarise/extract/classify/translate over ctx.llm
  * - weather-tools:   rh_weather_forecast/air over Open-Meteo (keyless, SSRF-guarded)
  * - files-tools:     rh_files_put/get/list/share/delete over Cloudflare R2
+ * - events-tools:    rh_events_create/due/list/free/cancel over ctx.storageDomain
+ * - notify-tools:    rh_notify_send over ntfy.sh (keyless)
  * - exec-tools:      rh_run / rh_run_bg over ctx.subprocess + ctx.jobs
  * - guard-tools:     tools/pre-execute policy (config.rules)
  * - skills:          the packaged dsh-righthand skill (ctx.skills)
@@ -34,6 +38,8 @@ import * as taskTools from './task-tools.ts'
 import * as textTools from './text-tools.ts'
 import * as weatherTools from './weather-tools.ts'
 import * as filesTools from './files-tools.ts'
+import * as eventsTools from './events-tools.ts'
+import * as notifyTools from './notify-tools.ts'
 import * as righthandSkills from './skills.ts'
 import type { GuardRule } from './guard-tools.ts'
 
@@ -62,12 +68,14 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(textTools)
   ctx.plugin(weatherTools)
   ctx.plugin(filesTools)
+  ctx.plugin(eventsTools)
+  ctx.plugin(notifyTools)
   ctx.plugin(guardTools, { rules: config.rules ?? [] })
   ctx.plugin(righthandSkills)
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, filesTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, filesTools, eventsTools, notifyTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'
@@ -75,6 +83,8 @@ export type { GuardFacts } from './guard-tools.ts'
 export { isBlockedIP, guardedFetch, normalizeForecast, normalizeAir } from './weather-tools.ts'
 export { createR2Client, R2_ACCESS_KEY_REF, R2_SECRET_KEY_REF } from './files-tools.ts'
 export { signRequest, presignGet } from './sigv4.ts'
+export { freeSlots } from './events-tools.ts'
+export type { Event } from './events-tools.ts'
 export type { R2Options, ListEntry } from './files-tools.ts'
 export type { WeatherConfig, ForecastOut, AirOut } from './weather-tools.ts'
 

@@ -1,6 +1,6 @@
 ---
 name: dsh-righthand
-description: Use when a task needs the righthand toolkit — durable key-value storage (rh_store_*), credential and settings management (rh_credential_* / rh_settings_*), governed command execution (rh_run / rh_run_bg), or its tool guard policy. Covers tool reference, guard semantics, and service availability.
+description: Use when a task needs the righthand toolkit — durable key-value storage (rh_store_*), a task board (rh_task_*), reminders (rh_events_*), credential and settings management (rh_credential_* / rh_settings_*), governed command execution (rh_run / rh_run_bg), language work (rh_text_*), weather/air data (rh_weather_*), R2 file tools (rh_files_*), ntfy push (rh_notify_send), or its tool guard policy. Covers tool reference, guard semantics, and service availability.
 ---
 
 # dsh-righthand
@@ -19,6 +19,8 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | text | `rh_text_summarise` / `rh_text_extract` / `rh_text_classify` / `rh_text_translate` | `ctx.llm` (one model call per verb) | Language work: shorten, turn into JSON matching a schema, sort into your labels with confidence, or translate preserving formatting. |
 | weather | `rh_weather_forecast` / `rh_weather_air` | Open-Meteo (keyless) via the SSRF-guarded fetcher | Current conditions + 3-day min/max, or PM2.5/PM10/AQI, for a lat/lon. Keyless only — anything needing an API token is out of scope. |
 | files | `rh_files_put` / `rh_files_get` / `rh_files_list` / `rh_files_share` / `rh_files_delete` | Cloudflare R2 (the user's own account) | Store/read/list/share/delete objects in an R2 bucket. `rh_files_share` returns a presigned download URL valid for N minutes (default 60, max 7 days) — anyone with the URL can read it for that window. |
+| events | `rh_events_create` / `rh_events_due` / `rh_events_list` / `rh_events_free` / `rh_events_cancel` | `ctx.storageDomain` (typed `righthand_events` domain) | Reminders. The agent IS the scheduler: `rh_events_due` each turn returns pending events whose time has come and marks them notified — delivered exactly once, never silently dropped. `rh_events_free` finds free slots within local working hours 09:00–17:00. |
+| notify | `rh_notify_send` | ntfy.sh (keyless) | Interrupt yourself on your own devices: publish to a topic; subscribed devices receive it. The topic name is the only secret — use an unguessable one. |
 | guard | (policy, not a tool) | `ctx.tools` `tools/pre-execute` | Configured via plugin config `rules`; gates tools by name prefix with `allow` / `deny` / `ask` modes. |
 
 ## Store semantics
@@ -26,6 +28,18 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - One domain `righthand_store`: a `rows` table (string key → JSON value + timestamp) and a global write counter.
 - `rh_store_get` returns `{ found, key, value?, updatedAt? }` — `found: false` means the key is absent, not an error.
 - Writes are durable (backend flush before commit) and serialized on one write chain; values must be JSON-serializable.
+
+## Events semantics
+
+- One domain `righthand_events`; states `pending` → `notified` (or `cancelled`).
+- `rh_events_due` is the per-turn check: pending events with `at <= now` are returned once and marked notified, so a missed turn leaves a visible record, never silence.
+- `rh_events_free` works in local time, working hours 09:00–17:00; durations are in minutes.
+- One-off events only; a real scheduler (Cloudflare cron) is the documented escalation.
+
+## Notify semantics
+
+- Keyless publish to ntfy.sh; the topic name is the only secret (choose an unguessable one, like a random string).
+- Priority 1–5; title optional; auto-delete after 24h. Publishing goes through the SSRF-guarded fetcher.
 
 ## Files semantics
 
@@ -68,6 +82,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | `defaultScriptPrefix` | `"rh-"` | default name prefix for generated workers/scripts |
 | `defaultZone` | `""` | default Cloudflare zone |
 | `defaultR2Bucket` | `""` | default R2 bucket for `rh_files_*` |
+| `defaultNotifyTopic` | `""` | default ntfy topic for `rh_notify_send` |
 
 ## Guard policy
 
@@ -77,5 +92,5 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Service availability
 
-- **web profile**: all twenty-seven tools register (`storageDomain` is provided by the web app rows).
-- **other profiles** (e.g. headless): the store and task families stay dormant; the other seven tools still register. The plugin never fails the boot.
+- **web profile**: all thirty-three tools register (`storageDomain` is provided by the web app rows).
+- **other profiles** (e.g. headless): the store, task and events families stay dormant (no `storageDomain`); the other nineteen tools (secrets, settings, exec, text, weather, files, notify) still register. The plugin never fails the boot.
