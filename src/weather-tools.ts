@@ -15,6 +15,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { lookup } from 'node:dns/promises'
 import { isIP } from 'node:net'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-weather'
 export const inject = ['tools']
@@ -188,6 +189,8 @@ export function apply(ctx: Context, config: WeatherConfig = {}): void {
       },
       render: (_args, value) => { const c = value.current as any; return [{ type: 'text', text: c ? (value.timezone + ': ' + c.temperature + ' C, wind ' + c.windspeed + ' km/h') : value.timezone + ': current conditions unavailable' }] },
     },
+    presentCall: (args: any) => genCall('Weather at ' + args.latitude + ', ' + args.longitude, 'fetch'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const url = cfg.forecastUrl
         + '?latitude=' + args.latitude
@@ -220,6 +223,8 @@ export function apply(ctx: Context, config: WeatherConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'PM2.5 ' + value.pm2_5 + ', PM10 ' + value.pm10 + ', AQI ' + value.aqi }],
     },
+    presentCall: (args: any) => genCall('Air quality at ' + args.latitude + ', ' + args.longitude, 'fetch'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const url = cfg.airUrl
         + '?latitude=' + args.latitude

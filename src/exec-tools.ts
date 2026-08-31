@@ -9,7 +9,9 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import type { ToolCallView, ToolResultView } from '@deepseek-ai/dsh-tools'
 import type { SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
+import { genCall, genResult, textOf } from './cards.ts'
 import type {} from '@deepseek-ai/dsh-jobs'
 
 export const name = 'righthand-exec'
@@ -41,6 +43,12 @@ export function apply(ctx: Context): void {
         },
       },
       render: (_args, value) => [{ type: 'text', text: `exit ${value.exitCode ?? ('signal ' + value.signal)}; stdout=${value.stdout.length}b stderr=${value.stderr.length}b` }],
+      presentationMeta: (_args, value) => ({ exitCode: value.exitCode ?? null, signal: value.signal ?? null }),
+    },
+    presentCall: (args: any): ToolCallView => ({ card: 'terminal', title: args.argv.join(' '), description: 'run one command (bounded collect)' }),
+    presentResult: (_args, result): ToolResultView => {
+      const meta = result.meta as any
+      return { card: 'terminal', output: textOf(result.content) + '\n' + (meta?.exitCode ?? ''), exitCode: meta?.exitCode ?? undefined, signal: meta?.signal ?? undefined }
     },
     async execute(args, exec) {
       const maxBytes = args.maxOutputBytes ?? 4096
@@ -89,6 +97,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `started background job ${value.jobId} (${value.label})` }],
     },
+    presentCall: (args: any): ToolCallView => genCall('Background job: ' + (args.label ?? args.argv[0]), 'execute'),
+    presentResult: (_args, result): ToolResultView => genResult(result),
     async execute(args, exec) {
       const label = args.label ?? args.argv.join(' ')
       const jobId = ctx.jobs.start({

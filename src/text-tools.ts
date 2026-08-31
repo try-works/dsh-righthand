@@ -11,6 +11,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { BlockAssembler, createUserMessage, deepFreeze } from '@deepseek-ai/dsh-llm'
 import type { GenerateOptions } from '@deepseek-ai/dsh-llm'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-text'
 export const inject = ['tools', 'llm']
@@ -84,6 +85,8 @@ export function apply(ctx: Context, config: TextConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.summary }],
     },
+    presentCall: () => genCall('Summarise text', 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args, exec) {
       const n = args.sentences ?? 3
       const summary = await ask(ctx, cfg, SUMMARISE_SYSTEM, 'Summarise this in about ' + n + ' sentences:\n\n' + args.text, 600, exec.signal)
@@ -107,6 +110,8 @@ export function apply(ctx: Context, config: TextConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: JSON.stringify(value.extracted) }],
     },
+    presentCall: () => genCall('Extract per JSON Schema', 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args, exec) {
       const framed = 'Schema:\n' + JSON.stringify(args.schema) + '\n\nText:\n' + args.text
       const raw = await ask(ctx, cfg, EXTRACT_SYSTEM, framed, 800, exec.signal)
@@ -131,6 +136,8 @@ export function apply(ctx: Context, config: TextConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.label + ' (' + value.confidence + ')' }],
     },
+    presentCall: () => genCall('Classify text', 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args, exec) {
       if (args.labels.length === 0) throw new Error('classify needs at least one label')
       const framed = 'Labels: ' + JSON.stringify(args.labels) + '\n\nText:\n' + args.text
@@ -159,6 +166,8 @@ export function apply(ctx: Context, config: TextConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.translation }],
     },
+    presentCall: (args: any) => genCall('Translate to ' + args.language, 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args, exec) {
       const framed = 'Translate the following into ' + args.language + ':\n\n' + args.text
       const translation = await ask(ctx, cfg, TRANSLATE_SYSTEM, framed, 800, exec.signal)

@@ -15,6 +15,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
 import { settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { signRequest, presignGet } from './sigv4.ts'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-files'
 export const inject = ['tools', 'credentials', 'settings']
@@ -178,6 +179,8 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'stored ' + value.key + ' (' + value.size + ' bytes)' }],
     },
+    presentCall: (args: any) => genCall('Upload ' + args.key, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const c = await client()
       return c.put(args.key, args.content, args.contentType)
@@ -203,6 +206,8 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.found && typeof value.content === 'string' ? value.content : '(absent)' }],
     },
+    presentCall: (args: any) => genCall('Read object ' + args.key, 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const c = await client()
       const out = await c.get(args.key)
@@ -231,6 +236,8 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.entries.length + ' objects' }],
     },
+    presentCall: () => genCall('List bucket', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const c = await client()
       const entries = await c.list(args.prefix, args.maxKeys)
@@ -257,6 +264,8 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.url }],
     },
+    presentCall: (args: any) => genCall('Share ' + args.key + ' for ' + (args.minutes ?? 60) + ' min', 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const minutes = Math.min(Math.max(args.minutes ?? 60, 1), 10080)
       const c = await client()
@@ -282,6 +291,8 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'deleted ' + value.key + ': ' + value.existed }],
     },
+    presentCall: (args: any) => genCall('Delete object ' + args.key, 'delete'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const c = await client()
       return c.delete(args.key)

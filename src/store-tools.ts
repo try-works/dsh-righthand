@@ -8,6 +8,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import type { ToolCallView, ToolResultView } from '@deepseek-ai/dsh-tools'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import type { Domain } from '@deepseek-ai/dsh-storage-domain'
 import { z } from 'zod'
@@ -110,6 +111,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `stored ${value.key} (writes=${value.writes})` }],
     },
+    presentCall: (args: any): ToolCallView => ({ card: 'generic', title: 'Store ' + args.key, kind: 'edit' }),
+    presentResult: (_args, result): ToolResultView => ({ card: 'generic', content: result.content }),
     async execute(args) {
       const s = await ensure()
       const row = await s.put(args.key, args.value)
@@ -136,6 +139,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.found ? `${value.key} = ${JSON.stringify(value.value)}` : `${value.key} (absent)` }],
     },
+    presentCall: (args: any): ToolCallView => ({ card: 'generic', title: 'Read ' + args.key, kind: 'read' }),
+    presentResult: (_args, result): ToolResultView => ({ card: 'generic', content: result.content }),
     async execute(args) {
       const s = await ensure()
       const row = await s.get(args.key)
@@ -161,6 +166,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `deleted ${value.key}: ${value.existed}` }],
     },
+    presentCall: (args: any): ToolCallView => ({ card: 'generic', title: 'Delete ' + args.key, kind: 'delete' }),
+    presentResult: (_args, result): ToolResultView => ({ card: 'generic', content: result.content }),
     async execute(args) {
       const s = await ensure()
       const existed = await s.delete(args.key)
@@ -176,6 +183,8 @@ export function apply(ctx: Context): void {
       schema: { type: 'array', items: { type: 'string' } },
       render: (_args, keys) => [{ type: 'text', text: keys.length === 0 ? '(empty)' : keys.join('\n') }],
     },
+    presentCall: (): ToolCallView => ({ card: 'generic', title: 'List store keys', kind: 'read' }),
+    presentResult: (_args, result): ToolResultView => ({ card: 'generic', content: result.content }),
     async execute() {
       const s = await ensure()
       return s.list()

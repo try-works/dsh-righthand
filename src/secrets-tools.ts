@@ -11,6 +11,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
 import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+import { genCall, genResult } from './cards.ts'
 import z from '@deepseek-ai/schemastery'
 
 export const name = 'righthand-secrets'
@@ -56,6 +57,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `${value.ref}: configured=${value.configured}${value.source ? ' (source=' + value.source + ')' : ''}, writable=${value.writable}` }],
     },
+    presentCall: (args: any) => genCall('Check credential ' + args.ref, 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const ref = credentialRef(args.ref)
       const info = await ctx.credentials.describe(ref)
@@ -81,6 +84,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `stored credential ${value.ref} (value not echoed)` }],
     },
+    presentCall: (args: any) => genCall('Store credential ' + args.ref, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       if (args.value.length === 0) throw new Error('credential value must be non-empty')
       await ctx.credentials.set(credentialRef(args.ref), args.value)
@@ -105,6 +110,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: `removed credential ${value.ref}` }],
     },
+    presentCall: (args: any) => genCall('Remove credential ' + args.ref, 'delete'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       await ctx.credentials.unset(credentialRef(args.ref))
       return { ref: args.ref, removed: true }
@@ -119,6 +126,8 @@ export function apply(ctx: Context): void {
       schema: { type: 'object', additionalProperties: true },
       render: (_args, value) => [{ type: 'text', text: JSON.stringify(value, null, 2) }],
     },
+    presentCall: () => genCall('righthand settings', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute() {
       const v = scope.get()
       return { accountId: v.accountId, defaultScriptPrefix: v.defaultScriptPrefix, defaultZone: v.defaultZone, defaultR2Bucket: v.defaultR2Bucket, defaultNotifyTopic: v.defaultNotifyTopic }
@@ -141,6 +150,8 @@ export function apply(ctx: Context): void {
       },
       render: () => [{ type: 'text', text: 'settings updated' }],
     },
+    presentCall: (args: any) => genCall('Patch righthand settings (' + Object.keys(args.patch).join(', ') + ')', 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       await scope.update(args.patch as Partial<RighthandSettings>)
       return { applied: true }

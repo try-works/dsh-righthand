@@ -13,6 +13,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import type { Domain } from '@deepseek-ai/dsh-storage-domain'
 import { z } from 'zod'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-events'
 export const inject = ['tools', 'storageDomain']
@@ -134,6 +135,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'event ' + value.id + ': ' + value.title + ' at ' + value.at }],
     },
+    presentCall: (args: any) => genCall('Reminder: ' + args.title + ' at ' + args.at, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const d = await ensure()
       const at = new Date(args.at)
@@ -166,6 +169,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.due.length === 0 ? '(nothing due)' : value.due.map((e: any) => e.title + ' at ' + e.at).join(' / ') }],
     },
+    presentCall: () => genCall('Due events', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute() {
       const d = await ensure()
       const now = Date.now()
@@ -192,6 +197,8 @@ export function apply(ctx: Context): void {
       schema: { type: 'array', items: { type: 'json' } },
       render: (_args, value) => [{ type: 'text', text: value.length === 0 ? '(no events)' : (value as any[]).map((e: any) => e.at + ' ' + e.title + ' [' + e.state + ']').join(' / ') }],
     },
+    presentCall: () => genCall('Events', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const events = await all()
       const wanted = args.state ?? null
@@ -213,6 +220,8 @@ export function apply(ctx: Context): void {
       schema: { type: 'array', items: { type: 'string' } },
       render: (_args, value) => [{ type: 'text', text: value.length === 0 ? '(no free slot)' : (value as string[]).join(' / ') }],
     },
+    presentCall: (args: any) => genCall('Free slots (' + args.durationMinutes + 'm)', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const events = await all()
       return freeSlots(events, new Date(), args.durationMinutes, args.horizonHours ?? 24)
@@ -236,6 +245,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'cancelled ' + value.id + ': ' + value.existed }],
     },
+    presentCall: (args: any) => genCall('Cancel event ' + args.id, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const d = await ensure()
       const e = d.table('events').get(args.id)

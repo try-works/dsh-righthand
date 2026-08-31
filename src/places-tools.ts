@@ -12,6 +12,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { guardedFetch } from './weather-tools.ts'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-places'
 export const inject = ['tools']
@@ -122,6 +123,8 @@ export function apply(ctx: Context, config: PlacesConfig = {}): void {
         return [{ type: 'text', text }]
       },
     },
+    presentCall: (args: any) => genCall('Places: ' + args.query, 'search'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const limit = Math.min(Math.max(1, Math.round(args.limit ?? 5)), 20)
       const qs = new URLSearchParams({ q: args.query, format: 'jsonv2', addressdetails: '1', limit: String(limit) })
@@ -153,6 +156,8 @@ export function apply(ctx: Context, config: PlacesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.displayName }],
     },
+    presentCall: (args: any) => genCall('Reverse geocode ' + args.latitude + ', ' + args.longitude, 'fetch'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const qs = new URLSearchParams({ lat: String(args.latitude), lon: String(args.longitude), format: 'jsonv2', addressdetails: '1' })
       const body = await guardedFetch(cfg.nominatimUrl + '/reverse?' + qs.toString(), { init: { headers: nomHeaders } })
@@ -181,6 +186,8 @@ export function apply(ctx: Context, config: PlacesConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: value.elevation + ' m' }],
     },
+    presentCall: (args: any) => genCall('Elevation at ' + args.latitude + ', ' + args.longitude, 'fetch'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const qs = new URLSearchParams({ latitude: String(args.latitude), longitude: String(args.longitude) })
       const body = await guardedFetch(cfg.elevationUrl + '?' + qs.toString())
@@ -207,6 +214,8 @@ export function apply(ctx: Context, config: PlacesConfig = {}): void {
         return [{ type: 'text', text }]
       },
     },
+    presentCall: (args: any) => genCall('Nearby: ' + args.query + ' within ' + (args.radiusKm ?? 1) + ' km', 'search'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const radius = Math.min(Math.max(0.1, Number(args.radiusKm ?? 1)), 20)
       const limit = Math.min(Math.max(1, Math.round(args.limit ?? 5)), 20)

@@ -12,6 +12,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import type { Domain } from '@deepseek-ai/dsh-storage-domain'
 import { z } from 'zod'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-task'
 export const inject = ['tools', 'storageDomain']
@@ -96,6 +97,8 @@ export function apply(ctx: Context): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'task ' + value.id + ' created: ' + value.title + ' (open)' }],
     },
+    presentCall: (args: any) => genCall('New task: ' + args.title, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const d = await ensure()
       const now = new Date().toISOString()
@@ -136,6 +139,8 @@ ctx.tools.register(defineTool({
       },
       render: (_args, tasks) => [{ type: 'text', text: tasks.length === 0 ? '(no tasks)' : tasks.map((t: any) => '[' + t.state + '] ' + t.title).join(' / ') }],
     },
+    presentCall: () => genCall('Task board', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const tasks = await all()
       const wanted = args.state ?? null
@@ -164,6 +169,8 @@ ctx.tools.register(defineTool({
       },
       render: (_args, value) => [{ type: 'text', text: value.found ? 'next: ' + value.title : '(nothing open)' }],
     },
+    presentCall: () => genCall('Next task', 'read'),
+    presentResult: (_args, result) => genResult(result),
     async execute() {
       const tasks = await all()
       const open = tasks.filter(t => t.state === 'open').sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -192,6 +199,8 @@ ctx.tools.register(defineTool({
       },
       render: (_args, value) => [{ type: 'text', text: value.found ? 'task ' + value.id + ' -> ' + value.state : 'task ' + value.id + ' not found' }],
     },
+    presentCall: (args: any) => genCall('Update task ' + args.id, 'edit'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const d = await ensure()
       const task = d.table('tasks').get(args.id)
@@ -224,6 +233,8 @@ ctx.tools.register(defineTool({
       },
       render: (_args, value) => [{ type: 'text', text: 'deleted ' + value.id + ': ' + value.existed }],
     },
+    presentCall: (args: any) => genCall('Delete task ' + args.id, 'delete'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const d = await ensure()
       const existed = await d.table('tasks').delete(args.id)

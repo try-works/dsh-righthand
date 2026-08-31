@@ -10,6 +10,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { guardedFetch } from './weather-tools.ts'
+import { genCall, genResult } from './cards.ts'
 
 export const name = 'righthand-notify'
 export const inject = ['tools', 'settings']
@@ -45,6 +46,8 @@ export function apply(ctx: Context, config: NotifyConfig = {}): void {
       },
       render: (_args, value) => [{ type: 'text', text: 'notified ' + value.topic }],
     },
+    presentCall: (args: any) => genCall('Notify: ' + args.message.slice(0, 60), 'execute'),
+    presentResult: (_args, result) => genResult(result),
     async execute(args) {
       const settings = ctx.settings.get(ns) as { defaultNotifyTopic?: string } | undefined
       const topic = args.topic ?? config.topic ?? settings?.defaultNotifyTopic ?? ''
