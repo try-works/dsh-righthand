@@ -1,0 +1,18 @@
+# blueprint/reminder-flow - run log
+
+## Learnings (from building the events + notify families, 0.1.8)
+
+1. **Exactly-once lives in the state flip.** rh_events_due returns and
+   marks notified in the same call; the caller never has to remember
+   what it already delivered. A missed turn leaves a pending record -
+   visible, never silent.
+2. **Working hours are local time.** freeSlots tests first assumed UTC
+   and failed on a UTC+8 machine; rewritten with local Date
+   constructors. Any scheduled feature inherits this trap.
+3. **The notify topic is the only secret.** ntfy.sh is keyless;
+   anything that guesses the topic can read it. Unguessable random
+   string, and the publish still goes through the SSRF-guarded
+   fetcher.
+4. **One-off events only.** Recurring reminders are create-again-on-
+   fire; a real scheduler (Cloudflare cron) is the documented
+   escalation, not a built primitive.

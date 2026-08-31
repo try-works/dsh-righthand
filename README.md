@@ -6,7 +6,7 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
-The plugin also ships **blueprint guidance** — ten named recipes for the agent-built tools this plugin exists to compose (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+The plugin also ships **blueprint guidance** — fifteen named recipes for the agent-built tools this plugin exists to compose, six of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
 
 ## Install
 
@@ -93,6 +93,10 @@ canonical example of the current DSH-native form (tool-to-tool via
 |---|---|
 | `blueprint/daily-digest` | Collect sources, summarize, send on a schedule — extractive locally, LLM synthesis as escalation |
 | `blueprint/data-adapter` | Wrap one keyless public API as a tool family: guarded fetch, normalize, one tool per query. Worked examples ship in the plugin: `rh_weather_*`, `rh_places_*` |
+| `blueprint/reminder-flow` | The agent as its own scheduler: `rh_events_*` checked each turn, `rh_notify_send` delivery, one store receipt per event — exactly-once via the state flip |
+| `blueprint/geo-context` | A place query becomes agent context: geocode, then elevation + weather + air + nearby at those coordinates, TTL-cached in `rh_store` |
+| `blueprint/governed-exec` | Every high-impact command as a governed, receipted step: guard gates the prefix, `rh_run` collects, the store keeps the before/after undo trail |
+| `blueprint/file-vault` | R2 as the agent's file system with the store as the index: `rh_files_*` blobs + metadata records + time-boxed presigned shares |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |

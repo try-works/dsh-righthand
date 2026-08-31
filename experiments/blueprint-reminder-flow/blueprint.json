@@ -1,0 +1,40 @@
+{
+  "name": "blueprint/reminder-flow",
+  "kind": "blueprint",
+  "description": "The agent as its own scheduler: rh_events_* reminders checked each turn, rh_notify_send to interrupt yourself on your devices, one store receipt per delivery. Escalation is Cloudflare cron (documented, not built).",
+  "keywords": ["reminder", "events", "scheduler", "notify", "ntfy", "due", "free-slot", "alarm"],
+  "use_cases": ["remind me to send X at 9am", "free-slot lookups", "turn-based due checks", "deliver-once alarms"],
+  "ingredients": [
+    "rh_events_create / rh_events_due / rh_events_list / rh_events_free / rh_events_cancel",
+    "rh_notify_send (ntfy.sh, keyless - unguessable topic is the only secret)",
+    "rh_store_put receipt per delivery",
+    "freeSlots (exported working-hours slot finder)"
+  ],
+  "recipe": "create the event -> each turn rh_events_due returns the pending events whose time has come and marks them notified (delivered exactly once, never silently dropped) -> rh_notify_send to the topic -> store a receipt { eventId, at, notifiedAt }",
+  "result_kind": "per-turn agent routine + one store receipt per delivery",
+  "invoke_contract": {
+    "create": "{ title, detail?, at, horizonHours? }",
+    "due": "{ horizonHours? } -> { id, title, detail, at }[] (and marks them notified)",
+    "free": "{ durationMinutes, horizonHours? } -> ISO slot strings within working hours"
+  },
+  "config_variants": {
+    "transport": "ntfy topic (defaultNotifyTopic setting) | none (receipts only)",
+    "cadence": "every turn (agent loop) | cron escalation (user's Cloudflare)"
+  },
+  "cost_hint": "free (keyless ntfy + local store)",
+  "pitfalls": [
+    "run rh_events_due EVERY turn - a missed run still leaves the event pending, but the delivery waits",
+    "due marks notified at return time: exactly-once comes from the state flip, not from the caller",
+    "the ntfy topic name is the only secret - unguessable random string, never a guessable name",
+    "freeSlots is local-time working hours 09:00-17:00 - mind the machine timezone",
+    "one-off events only; recurring reminders are create-again-on-fire or the cron escalation"
+  ],
+  "local_limits": "delivery only happens on turns the agent actually runs; no wake-from-sleep",
+  "cloud_limits": "cron escalation (documented) needs a Worker + the user's Cloudflare account; not a built primitive yet",
+  "related": ["rh_events_*", "rh_notify_send", "blueprint/governed-exec", "blueprint/daily-digest"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

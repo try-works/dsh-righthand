@@ -1,0 +1,41 @@
+{
+  "name": "blueprint/file-vault",
+  "kind": "blueprint",
+  "description": "R2 as the agent's file system with the store as the index: rh_files_* moves blobs, rh_store holds metadata (tags, titles, fetchedAt), rh_files_share hands out time-boxed presigned URLs. The first blueprint on a real Cloudflare primitive.",
+  "keywords": ["files", "r2", "vault", "storage", "presign", "share", "index", "metadata", "sigv4"],
+  "use_cases": ["keep a file across sessions", "share a file for N minutes", "index what is in the bucket", "attach metadata to blobs"],
+  "ingredients": [
+    "rh_files_put / rh_files_get / rh_files_list / rh_files_share / rh_files_delete (Cloudflare R2, SigV4-signed)",
+    "rh_store index: one record per object { key, contentType, size, tags, fetchedAt }",
+    "createR2Client / signRequest / presignGet (exported, injectable for tests)",
+    "credentials R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY + settings accountId / defaultR2Bucket"
+  ],
+  "recipe": "rh_files_put the blob -> rh_store_put the index record -> find by scanning the index, not the bucket -> rh_files_share for a time-boxed URL when somebody else needs it -> rh_files_delete removes the blob AND its index record",
+  "result_kind": "R2 objects + one store index record per object",
+  "invoke_contract": {
+    "put": "{ key, content, contentType? } -> object stored + index record",
+    "share": "{ key, minutes? } -> presigned URL valid that long (default 60, max 7 days)",
+    "find": "prefix scan of the index -> { key, tags, size, fetchedAt }[]"
+  },
+  "config_variants": {
+    "auth": "credential provider (R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY)",
+    "bucket": "settings defaultR2Bucket | per-call override"
+  },
+  "cost_hint": "R2 storage on the user's own account (free tier exists); egress metered",
+  "pitfalls": [
+    "a presigned URL is a secret for its validity window - treat it like one",
+    "content is text by default (text/plain) - set contentType for anything else",
+    "the signer is pinned to the AWS test vector - a SigV4 change that breaks it fails the test",
+    "absent keys answer { found: false }, not an error - that is the exists() check",
+    "keep metadata in the store index, not in object keys - rename-by-key rewrite is expensive",
+    "delete both places (blob + index) or the index lies"
+  ],
+  "local_limits": "needs the user's R2 credentials and accountId configured; built and unit-tested but not yet live-probed against a real bucket",
+  "cloud_limits": "the first family on an actual Cloudflare primitive; Workers integration is the next escalation",
+  "related": ["rh_files_*", "src/sigv4.ts", "blueprint/governed-exec", "blueprint/daily-digest"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "blueprint/geo-context",
+  "kind": "blueprint",
+  "description": "Turn a place query into agent context: geocode with rh_places_geocode, then elevation + weather + nearby at those coordinates, cached in rh_store with a TTL so repeated questions stay free.",
+  "keywords": ["places", "geocode", "weather", "elevation", "nearby", "geo", "location", "context", "cache"],
+  "use_cases": ["what is the weather where X is", "is X above the snow line", "what is near X", "location-aware agent context"],
+  "ingredients": [
+    "rh_places_geocode / rh_places_address / rh_places_elevation / rh_places_nearby (Nominatim + Open-Meteo, keyless)",
+    "rh_weather_forecast / rh_weather_air (Open-Meteo, keyless)",
+    "rh_store TTL cache keyed by place",
+    "distanceKm / nearbyViewbox (exported geospatial helpers)"
+  ],
+  "recipe": "query -> rh_places_geocode (first hit wins) -> parallel rh_places_elevation + rh_weather_forecast + rh_weather_air at the hit coordinates -> rh_places_nearby for the around-me question -> rh_store_put { ...context, fetchedAt } -> subsequent asks hit the cache while fresh",
+  "result_kind": "one store record per place: { place, elevation, weather, air, nearby, fetchedAt }",
+  "invoke_contract": {
+    "input": "place query string",
+    "output": "geo-context record (place + elevation + weather + air + nearby)"
+  },
+  "config_variants": {
+    "cache": "none | rh_store TTL (default 30 min)",
+    "depth": "elevation+weather | +air | +nearby"
+  },
+  "cost_hint": "free (both providers keyless; the cache keeps repeat calls near zero)",
+  "pitfalls": [
+    "Nominatim usage policy: identify yourself with a User-Agent and keep to agent-paced 1 req/s",
+    "reverse-geocode misses answer HTTP 200 with { error } - surface it, do not fabricate a place",
+    "nearby = bounded search: viewbox of left,top,right,bottom + bounded=1; distanceKm is computed client-side (haversine), Nominatim returns none",
+    "geocode result order is importance-ranked, not exact-match - confirm the first hit is the intended place before the weather calls",
+    "weather/air output schemas reject null - absent pollutants are omitted, not null"
+  ],
+  "local_limits": "Nominatim public instance is rate-limited; cache before you retry anything",
+  "cloud_limits": "same keyless endpoints reachable from a Worker; egress mostly free",
+  "related": ["rh_places_*", "rh_weather_*", "blueprint/data-adapter", "blueprint/reminder-flow"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}

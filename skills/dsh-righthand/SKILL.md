@@ -106,3 +106,7 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 - **web profile**: all thirty-seven tools register (`storageDomain` is provided by the web app rows).
 - **other profiles** (e.g. headless): the store, task and events families stay dormant (no `storageDomain`); the other twenty-three tools (secrets, settings, exec, text, weather, places, files, notify) still register. The plugin never fails the boot.
+
+## Composition blueprints
+
+Repo guidance kits under `experiments/` (each a `blueprint.json` spec + recipe + learnings) for composing the tools into routines. Committed kits: `blueprint/daily-digest` (collect → summarize → send), `blueprint/data-adapter` (wrap a keyless API; worked examples `rh_weather_*` / `rh_places_*`), `blueprint/reminder-flow` (events + notify + receipts), `blueprint/geo-context` (places + weather + store cache), `blueprint/governed-exec` (guard + receipts + undo trails), `blueprint/file-vault` (R2 + store index + presigned shares). The README catalogues nine more for future builds; `docs/scenario-patterns.md` holds the live-tested recipes.

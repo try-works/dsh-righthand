@@ -1,0 +1,40 @@
+{
+  "name": "blueprint/governed-exec",
+  "kind": "blueprint",
+  "description": "Every high-impact command as a governed, receipted step: guard rules gate the prefix, rh_run executes with bounded collected output, and the store keeps a before/after receipt (the undo trail). What the tool guard does per call, this blueprint does per task.",
+  "keywords": ["exec", "guard", "receipt", "undo", "audit", "deploy", "command", "deny", "ask"],
+  "use_cases": ["deploy a worker", "change a DNS record", "tidy folders with an undo trail", "audit every mutating command"],
+  "ingredients": [
+    "rh_run / rh_run_bg (argv array, no shell interpretation)",
+    "guard rules (config: toolPrefix + mode allow/deny/ask + destructive marker)",
+    "rh_store receipts: { argv, cwd, exitCode, at } and before/after undo pairs",
+    "guardFactsFor + permissions.golden (same lookup as enforcement)"
+  ],
+  "recipe": "gate the prefix with a guard rule -> write the before-receipt -> rh_run (collect mode when the output matters) -> write the after-receipt with exit code and a one-line summary -> revert = read the receipt and move each { to -> from } in reverse",
+  "result_kind": "one receipt key per command plus an undo trail for mutating steps",
+  "invoke_contract": {
+    "before": "{ argv, cwd, at }",
+    "after": "{ exitCode, ok, summary, at }",
+    "revert": "read receipt -> reverse each recorded mutation"
+  },
+  "config_variants": {
+    "gate": "none | deny destructive prefixes | ask with a policy function",
+    "journal": "receipts only | full before/after undo pairs"
+  },
+  "cost_hint": "free (local subprocess + store)",
+  "pitfalls": [
+    "rh_run is collect mode and bounded - the output you need must fit the cap; rh_run_bg reports status/exit but not captured stdout (live-verified)",
+    "argv arrays only - shell operators, pipes and redirects are the caller's job",
+    "a deny rule fires BEFORE dispatch; an ask rule defers to the policy function",
+    "the destructive marker documents why a prefix is gated but never changes enforcement",
+    "golden-file the derived facts (UPDATE_GOLDEN=1 pnpm test) so a guard change is a visible diff, not a surprise"
+  ],
+  "local_limits": "undo quality equals receipt quality - a mutation not recorded cannot be reverted",
+  "cloud_limits": "remote commands (wrangler deploy) need the user's Cloudflare credentials; the auth gate is rh_credential_describe first",
+  "related": ["rh_run", "rh_run_bg", "guard-tools", "blueprint/reminder-flow", "docs/scenario-patterns.md"],
+  "template": {
+    "spec": "blueprint.json",
+    "recipe": "README.md",
+    "learnings": "LEARNINGS.md"
+  }
+}
