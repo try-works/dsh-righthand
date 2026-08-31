@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/market-signals",
+  "kind": "blueprint",
+  "description": "Keyless prediction-market odds into a signal: fetch public Polymarket data, store the odds history, alert on threshold crossings",
+  "hermes_source": "prediction-markets",
+  "ingredients": ["guardedFetch over the public Polymarket API (keyless)", "rh_store odds:<market>:<ts> history", "threshold targets in the store", "rh_notify_send crossing alerts + alert-once"],
+  "recipe": "fetch the market's current odds -> append the history record -> compare against the stored target -> on crossing: notify once and record the alert",
+  "pitfalls": ["probe the endpoint first - market APIs drift", "odds are prices, not truth - the receipt records the source and time", "warn-once needs its own record or every poll re-fires", "one market per slug keeps the scans cheap"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

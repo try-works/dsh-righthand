@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/trip-plan",
+  "kind": "blueprint",
+  "description": "An itinerary from places and weather: geocode destinations, check the forecast at the dates, schedule itinerary events, store the trip and a briefing note",
+  "hermes_source": "travel",
+  "ingredients": ["rh_places_geocode destinations", "rh_weather_forecast at destination and dates", "rh_events_create itinerary events", "rh_store trip:<slug> + rh_text_summarise briefing"],
+  "recipe": "geocode each destination -> fetch the forecast for the travel dates -> schedule the itinerary as events -> store the trip and summarize a packing briefing",
+  "pitfalls": ["weather is a forecast - refresh near departure", "itinerary events are local time at the destination - mind timezones", "the briefing cites the forecast date"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

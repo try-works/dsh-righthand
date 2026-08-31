@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/secret-sweep",
+  "kind": "blueprint",
+  "description": "Periodic secret scans as receipts: run the scan pattern over repos, receipt per repo, a hit notifies once and blocks the ship gate",
+  "hermes_source": "Security",
+  "ingredients": ["rh_run the scan pattern over staged/working trees", "rh_store sweep:<repo>:<ts> receipts", "rh_notify_send on hit + alert-once", "pre-commit-gate integration"],
+  "recipe": "run the scan pattern -> receipt the result (clean or hits) -> a hit: notify once and block the gate -> fix, rescan, receipt",
+  "pitfalls": ["the scan pattern lives in the kit - never commit tokens", "a hit is a stop, not a warning", "scan staged content, not just the working tree"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

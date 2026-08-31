@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/spreadsheet-tools",
+  "kind": "blueprint",
+  "description": "Tabular data as diffable snapshots: read sheets via CLI, store normalized rows, diff against the previous snapshot, summarize the change",
+  "hermes_source": "xlsx",
+  "ingredients": ["rh_run openpyxl / csvkit", "rh_store data:<sheet>:<ts> snapshots", "diff by stable row key", "rh_text_summarise the change note"],
+  "recipe": "read the sheet into normalized rows -> store the snapshot -> diff against the previous snapshot -> summarize what changed",
+  "pitfalls": ["snapshots need stable row keys or the diff is noise", "keep everything JSON-serializable", "a missing tool is a red receipt"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

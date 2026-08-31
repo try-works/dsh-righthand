@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/image-pipeline",
+  "kind": "blueprint",
+  "description": "Image transforms as a pipeline: ffmpeg/ImageMagick run the transform, exit 0 gates the publish, R2 stores, the presigned link ships",
+  "hermes_source": "Media",
+  "ingredients": ["rh_run ffmpeg / ImageMagick", "rh_files_put outputs", "rh_store image:<slug> index", "rh_files_share + rh_notify_send"],
+  "recipe": "transform (resize, convert, strip) -> exit 0 means the file exists - gate the put -> publish and index -> share and notify",
+  "pitfalls": ["exit 0 gates the put - no empty uploads (artifact-publish)", "contentType at put time or the browser renders it wrong", "the presigned link expires - share then it is gone"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

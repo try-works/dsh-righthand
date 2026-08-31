@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/invoice-tracker",
+  "kind": "blueprint",
+  "description": "Invoices with teeth: extract vendor/amount/due, store the record, schedule a reminder event at the due date, deliver through the reminder flow",
+  "hermes_source": "Business & Finance",
+  "ingredients": ["rh_text_extract { vendor, amount, due }", "rh_store invoice:<id> records", "rh_events_create at the due date", "rh_events_due + rh_notify_send"],
+  "recipe": "extract the fields from the invoice text -> store the invoice record -> schedule a due-date event -> the due check delivers and marks notified; cancel the event when paid",
+  "pitfalls": ["a due-date parse failure is a clean error - recheck the invoice, never half-store", "cancel the event when paid - two halves, both closed", "amounts as numbers, dates as ISO strings"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

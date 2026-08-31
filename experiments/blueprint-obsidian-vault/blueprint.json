@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/obsidian-vault",
+  "kind": "blueprint",
+  "description": "The agent-notebook pattern over a real Obsidian vault: scan markdown via rh_run, index into the store, recall by prefix, compact long notes",
+  "hermes_source": "obsidian",
+  "ingredients": ["rh_run file reads over the vault path", "rh_store note:<slug> index records", "rh_text_summarise compaction", "rh_text_extract structured recall"],
+  "recipe": "scan the vault via rh_run -> index titles and paths into the store -> recall by prefix scan -> compact long notes with the original kept",
+  "pitfalls": ["vault paths are local - receipts carry them", "the index goes stale - rescan on change", "compaction never replaces the source note", "frontmatter and backlinks are markdown - parse, do not guess"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

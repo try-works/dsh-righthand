@@ -6,7 +6,7 @@ tool guard. Every tool is built on the harness's own services
 (`storageDomain`, `credentials`, `settings`, `subprocess`, `jobs`, `tools`),
 not hand-rolled primitives.
 
-The plugin also ships **blueprint guidance** — thirty-four named recipes for the agent-built tools this plugin exists to compose, twenty-five of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
+The plugin also ships **blueprint guidance** — eighty-four named recipes for the agent-built tools this plugin exists to compose, seventy-five of them committed kits (see [Blueprints](#blueprints) below) — plus a packaged skill, a settings namespace, and an optional tool guard.
 
 ## Install
 
@@ -116,6 +116,56 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/debug-loop` | The 4-phase root-cause loop — reproduce, evidence, hypothesize, verify — every phase a receipt (Hermes systematic-debugging) |
 | `blueprint/artifact-publish` | Render an artifact, publish to R2, index it, share a presigned link, notify (Hermes claude-design / architecture-diagram / p5js et al) |
 | `blueprint/delegate-cli-coder` | Delegate a bounded coding task to a CLI coder: brief, guard-gated invoke, receipts, diff reviewed by the pre-commit gate (Hermes claude-code / codex / opencode) |
+| `blueprint/routes-eta` | OSRM keyless routing + places endpoints + ETA reminder events (Hermes maps) |
+| `blueprint/video-digest` | yt-dlp transcripts via rh_run, chunked summarising, store digests (Hermes youtube-content) |
+| `blueprint/topic-radar` | Many keyless feeds on one topic: extract mentions, dedupe by url, digest (Hermes news) |
+| `blueprint/author-watch` | Follow an author's new arXiv papers, diff by id, summarise only the new (Hermes arxiv) |
+| `blueprint/market-signals` | Keyless prediction-market odds history + threshold crossing alerts (Hermes prediction-markets) |
+| `blueprint/open-data-snapshot` | Keyless civic datasets as diffable snapshots with a change note (Hermes open-data) |
+| `blueprint/page-watch` | Hash-diff a page each run, alert once on change with the delta (Hermes web-monitoring) |
+| `blueprint/fx-ledger` | Keyless ECB rates via frankfurter + budget-guard scan-and-sum conversion (Hermes finance) |
+| `blueprint/weather-alert` | Forecast thresholds become reminder events at the crossing time (Hermes weather) |
+| `blueprint/citation-graph` | Claim trails linked into a queryable graph, prefix-scan traversal (Hermes grounded-citations) |
+| `blueprint/mail-flow` | Local himalaya CLI mail + the inbox-triage pattern, credentials never in the plugin (Hermes himalaya) |
+| `blueprint/obsidian-vault` | The notebook pattern over a real vault: scan, index, recall, compact (Hermes obsidian) |
+| `blueprint/habit-tracker` | Streaks as store records with daily cue events and exactly-once delivery (Hermes fitness) |
+| `blueprint/meal-planner` | Recipes + extracted ingredients + grocery list + prep reminders (Hermes grocery/recipes) |
+| `blueprint/job-tracker` | Applications board with fit labels and follow-up events (Hermes jobs) |
+| `blueprint/trip-plan` | Geocode destinations, forecast at dates, itinerary events, briefing note (Hermes travel) |
+| `blueprint/draft-queue` | Drafts with a verified tone shift before release via notify/files (Hermes Communication) |
+| `blueprint/translate-docs` | Chunked rh_text_translate batches, reassembled and published via files (Hermes Translation) |
+| `blueprint/linked-notes` | Interlinked markdown KB with extracted backlinks, prefix-scan traversal (Hermes llm-wiki) |
+| `blueprint/device-ping` | Local device heartbeats via rh_run with streak alerts (Hermes Smart Home) |
+| `blueprint/gh-flow` | gh CLI steps as receipts, guard ask on push, gate on the diff (Hermes github) |
+| `blueprint/red-green-loop` | TDD enforced by red/green receipts, same command every run (Hermes test-driven-development) |
+| `blueprint/spike-lab` | Throwaway experiments with a recorded keep-or-throw verdict (Hermes spike) |
+| `blueprint/parallel-cleanup` | Fan-out cleanup of independent pieces, gate on the combined diff (Hermes simplify-code) |
+| `blueprint/cdp-debug` | Node --inspect in background + CDP over curl, no PTY needed (Hermes node-inspect-debugger) |
+| `blueprint/merge-arbiter` | Extract both conflict sides' intents, propose a neutral merge, gate verifies (Hermes merge-arbiter) |
+| `blueprint/cli-ops` | Any CLI operated safely: guard ask on mutations, receipts, verify (Hermes antigravity-cli) |
+| `blueprint/design-token-lint` | Token spec validation as a gate step with receipts (Hermes design-md) |
+| `blueprint/skill-authoring` | Author packaged dsh skills: frontmatter, reference body, ctx.skills, release (Hermes skill-authoring) |
+| `blueprint/handoff-review` | Adjudicate task handoffs: verify each outcome against evidence, accept or bounce (Hermes sdlc-review) |
+| `blueprint/media-fetch` | Keyless Wikimedia Commons media into R2 with presigned sharing (Hermes gif-search) |
+| `blueprint/image-pipeline` | ffmpeg/ImageMagick transforms, exit-0 gate, R2 publish, presigned link (Hermes Media) |
+| `blueprint/audio-analysis` | Audio metrics as receipts with a library note (Hermes songsee) |
+| `blueprint/video-ascii` | ASCII video renders to R2 with presigned sharing (Hermes ascii-video) |
+| `blueprint/manim-render` | Manim renders to R2 with presigned sharing (Hermes manim-video) |
+| `blueprint/design-snapshot` | Capture a site's design tokens into dated store snapshots + a reference artifact (Hermes claude-design) |
+| `blueprint/office-docs` | pandoc/python-docx pipelines: convert, extract fields, publish (Hermes docx) |
+| `blueprint/pdf-pipeline` | PDF extract/OCR/merge via CLI with receipts (Hermes pdf) |
+| `blueprint/spreadsheet-tools` | Sheets as diffable snapshots with a change note (Hermes xlsx) |
+| `blueprint/deck-pipeline` | python-pptx decks to R2 with presigned sharing (Hermes powerpoint) |
+| `blueprint/invoice-tracker` | Extract due dates from invoices, reminder events at the due date (Hermes finance) |
+| `blueprint/deploy-journal` | Deploy before/after receipts, smoke checks, revert from the undo trail (Hermes DevOps) |
+| `blueprint/env-audit` | Toolchain versions as diffable receipts (Hermes DevOps) |
+| `blueprint/dependency-audit` | Audit receipts + notify on high severity, re-audit after fix (Hermes Security) |
+| `blueprint/secret-sweep` | Periodic secret scans as receipts, a hit blocks the gate (Hermes Security) |
+| `blueprint/style-pass` | Verified tone shifts: classify, rewrite, re-classify, store the pair (Hermes humanizer) |
+| `blueprint/health-check-registry` | Named checks as store data run by the heartbeat (Hermes Networking) |
+| `blueprint/rss-social-mirror` | Keyless social monitoring via RSS with the 403 ladder (Hermes Social Media) |
+| `blueprint/transit-status` | Keyless status feeds as per-line heartbeats (Hermes transit) |
+| `blueprint/browser-session-log` | Browsing evidence receipts feeding the weekly review (Hermes browser) |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |

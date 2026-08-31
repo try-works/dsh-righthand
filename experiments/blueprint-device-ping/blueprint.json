@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/device-ping",
+  "kind": "blueprint",
+  "description": "Local device heartbeats: ping through rh_run, one receipt per device, alert once on a failure streak - the heartbeat pattern on the user's own network",
+  "hermes_source": "Smart Home",
+  "ingredients": ["rh_run ping (collect mode)", "rh_store device:<name>:<ts> receipts", "rh_notify_send streak alerts + alert-once", "rh_store registry device:<name> { host }"],
+  "recipe": "register the device with its host -> ping on the cadence -> receipt per ping -> failure streak: notify once",
+  "pitfalls": ["rh_run reaches local hosts by design - the SSRF public-only rule guards guardedFetch, not the user's own commands", "exit codes are the health signal, verbatim", "alert-once record dedupes the streak notify", "ping flags differ per OS - keep the argv portable"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/parallel-cleanup",
+  "kind": "blueprint",
+  "description": "Fan-out cleanup of recent changes: split into independent pieces, clean each in parallel, gate the combined diff, receipts per piece",
+  "hermes_source": "simplify-code",
+  "ingredients": ["harness workflow fan-out (the agent plans the split)", "rh_run per piece", "rh_store cleanup:<changeId>:<piece> receipts", "pre-commit-gate on the combined diff"],
+  "recipe": "split the recent changes into independent pieces -> fan out the cleanup, one piece per lane -> receipt per piece -> gate the combined diff before it ships",
+  "pitfalls": ["overlapping edits conflict - independence is the split's contract", "one receipt per piece keeps lanes auditable", "the gate reviews the diff (delegate-cli-coder learnings)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

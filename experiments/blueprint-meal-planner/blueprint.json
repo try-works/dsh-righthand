@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/meal-planner",
+  "kind": "blueprint",
+  "description": "Recipes become a plan: store recipes, extract ingredients, build the grocery list, schedule prep events, deliver through reminders",
+  "hermes_source": "grocery / recipes",
+  "ingredients": ["rh_store recipe:<slug> records", "rh_text_extract ingredients from recipe text", "grocery:<item> list keys", "rh_events_create prep reminders + rh_events_due delivery"],
+  "recipe": "store the recipe -> extract the ingredient list -> append to the grocery list (prefix-scan inventory) -> schedule prep events and let the due check deliver",
+  "pitfalls": ["the grocery list is a prefix scan - one key per item", "recipes must be JSON-serializable", "a bought item is a state flip on the key, not a delete (keep the list honest)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/env-audit",
+  "kind": "blueprint",
+  "description": "Toolchain drift as receipts: version commands for node/pnpm/git run through rh_run, one receipt per tool, diff against the previous snapshot",
+  "hermes_source": "DevOps",
+  "ingredients": ["rh_run version commands", "rh_store env:<ts> receipts", "diff by tool name", "rh_text_summarise the drift note"],
+  "recipe": "run version commands (collect, bounded) -> receipt per tool -> diff against the previous snapshot -> summarize the drift",
+  "pitfalls": ["a missing tool is a red receipt, not a guess", "exit codes are verbatim", "the snapshot only means something next to the previous one"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

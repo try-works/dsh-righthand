@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/open-data-snapshot",
+  "kind": "blueprint",
+  "description": "Keyless government and civic datasets as diffable snapshots: fetch, normalize, store, diff against the previous snapshot, summarize the change",
+  "hermes_source": "civic-data / open-data",
+  "ingredients": ["guardedFetch over keyless data APIs (USGS quakes is the canonical example)", "rh_store snapshot:<source>:<ts>", "diff by stable record id", "rh_text_summarise the change note"],
+  "recipe": "fetch the dataset endpoint -> normalize to the stable shape (data-adapter recipe) -> store the snapshot -> diff against the previous snapshot and summarize the change",
+  "pitfalls": ["snapshots need stable record ids or the diff is noise", "sources 503 - the blocked-page-recovery ladder applies", "size caps from guardedFetch bound every snapshot", "keep the raw snapshot AND the change note"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

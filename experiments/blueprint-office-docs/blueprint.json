@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/office-docs",
+  "kind": "blueprint",
+  "description": "Office document pipelines: pandoc/python-docx convert and extract via rh_run, the store keeps text + receipts, rh_text_extract pulls the structured fields",
+  "hermes_source": "docx",
+  "ingredients": ["rh_run pandoc / python-docx", "rh_store doc:<slug> text + receipts", "rh_text_extract structured fields", "rh_files_put artifacts"],
+  "recipe": "convert or extract the document text via CLI -> store the text and a receipt -> extract the structured fields -> publish converted artifacts",
+  "pitfalls": ["python tooling is local - a red receipt says install it", "office files are binary - convert before extract", "keep collect output small (text only, not the zip)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

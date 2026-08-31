@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/topic-radar",
+  "kind": "blueprint",
+  "description": "Many keyless feeds on one topic, ranked and deduped into a digest: fetch, extract mentions, dedupe by url, summarise, notify",
+  "hermes_source": "news / news-aggregator",
+  "ingredients": ["guardedFetch over keyless feeds", "rh_text_extract topic mentions", "rh_store rolling window", "rh_text_summarise digest + rh_notify_send"],
+  "recipe": "fetch N keyless feeds -> extract topic mentions per item -> dedupe by url across feeds -> rank, summarise, store the digest, notify once",
+  "pitfalls": ["dedupe before summarise - cross-posted items otherwise dominate", "a feed that 403s goes through the blocked-page-recovery ladder", "cap the window - the rolling scan is the trend", "rank by freshness and source, not just count"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

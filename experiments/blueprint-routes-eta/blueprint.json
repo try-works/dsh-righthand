@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/routes-eta",
+  "kind": "blueprint",
+  "description": "Routes and ETAs from the keyless OSRM public server, composed with places for endpoints and events for ETA reminders",
+  "hermes_source": "maps",
+  "ingredients": ["guardedFetch OSRM adapter (keyless, public server, light use only)", "rh_places_geocode for endpoints", "rh_events_create for ETA reminders", "rh_store route receipts"],
+  "recipe": "geocode origin and destination -> request the route from OSRM and normalize duration + distance -> cache the route with fetchedAt -> schedule an ETA event at the arrival time",
+  "pitfalls": ["the public OSRM server is for light use - cache routes, do not hammer it", "geocode results are importance-ranked - confirm the endpoints are the intended places", "durations are model-based, not live traffic - say so in the receipt", "ETAs are local-time events; freeSlots working hours apply"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

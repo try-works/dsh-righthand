@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/rss-social-mirror",
+  "kind": "blueprint",
+  "description": "Keyless social monitoring through RSS: fetch with a browser UA, parse, extract mentions, keep the window, digest material changes",
+  "hermes_source": "Social Media",
+  "ingredients": ["guardedFetch RSS feeds with browser UA + Accept headers", "local RSS parse", "rh_text_extract mention triples", "rh_store window + rh_text_summarise digest"],
+  "recipe": "fetch the RSS with browser UA (the 403 workaround) -> parse items -> extract mentions -> window + digest material changes",
+  "pitfalls": ["403/429 - the blocked-page-recovery ladder applies", "decode entities before stripping tags", "cut the boilerplate (submitted-by lines)", "spaced requests with backoff"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

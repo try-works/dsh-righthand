@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/draft-queue",
+  "kind": "blueprint",
+  "description": "Drafts with a tone check before release: write to the store, classify the tone against the target, rewrite until it matches, release via notify or files",
+  "hermes_source": "Communication",
+  "ingredients": ["rh_store draft:<slug> { text, targetTone }", "rh_text_classify tone labels", "agent rewrite loop", "rh_notify_send or rh_files_put release"],
+  "recipe": "write the draft with a target tone -> classify the current tone -> rewrite until the label matches (the rewrite is the agent's) -> release: store the final and notify or publish",
+  "pitfalls": ["classify answers verbatim or errors - the tone set is closed", "the rewrite is the agent's work; the tools verify, never draft", "store the before/after pair as evidence of the shift"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

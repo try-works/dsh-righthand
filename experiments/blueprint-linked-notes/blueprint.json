@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/linked-notes",
+  "kind": "blueprint",
+  "description": "An interlinked markdown KB in the store: notes carry links, extract keeps the backlinks fresh, traversal is a prefix scan",
+  "hermes_source": "llm-wiki",
+  "ingredients": ["rh_store note:<slug> records with links[]", "rh_text_extract backlinks from note text", "prefix scans for traversal", "rh_text_summarise page digests"],
+  "recipe": "write a note -> extract its links and store backlinks on the targets -> traverse the graph by prefix scan -> summarize hub notes into digests",
+  "pitfalls": ["the store is prefix-scan only - no graph queries, design keys for it", "backlinks live on the record, refreshed on edit", "compaction keeps the original (agent-notebook invariant)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

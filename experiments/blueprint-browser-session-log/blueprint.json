@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/browser-session-log",
+  "kind": "blueprint",
+  "description": "Browsing sessions with evidence: one receipt per step (url, action, finding), a session summary, and the records feed the weekly review",
+  "hermes_source": "browser",
+  "ingredients": ["harness browser tools", "rh_store browse:<session>:<n> receipts", "rh_text_summarise the session report", "the weekly review reads the session"],
+  "recipe": "record each step as it happens (url, action, finding) -> keep evidence per finding -> summarize the session -> the records feed the weekly review",
+  "pitfalls": ["record steps before the page changes - evidence evaporates", "findings carry actual vs expected (dogfood discipline)", "the session receipt is the memory the conversation will not keep"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

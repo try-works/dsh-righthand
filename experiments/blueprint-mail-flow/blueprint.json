@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/mail-flow",
+  "kind": "blueprint",
+  "description": "A local-credentials mail workflow: the himalaya CLI reads the user's own mailbox, the triage pattern prioritizes, tasks and events carry the follow-ups",
+  "hermes_source": "himalaya",
+  "ingredients": ["rh_run himalaya (credentials stay in the local CLI config, never in the plugin)", "rh_text_classify priority labels", "rh_text_extract { sender, ask, deadline }", "rh_task_create + rh_events_create follow-ups"],
+  "recipe": "list the mailbox via rh_run (collect mode) -> classify each thread into the closed priority set -> extract the ask and deadline -> board follow-ups as tasks and schedule the time-sensitive ones as events",
+  "pitfalls": ["mail credentials live in the local CLI config - the plugin never sees them", "collect mode bounds listing output - paginate large mailboxes", "a reply is yours to write - the tools prioritize only", "ignore is a decision too - record it"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

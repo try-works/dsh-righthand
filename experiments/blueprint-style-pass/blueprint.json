@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/style-pass",
+  "kind": "blueprint",
+  "description": "Tone shifts that verify: classify the current tone, the agent rewrites, classify again, store the before/after pair as evidence",
+  "hermes_source": "humanizer",
+  "ingredients": ["rh_text_classify tone labels", "agent rewrite", "re-classify to verify the shift", "rh_store before/after pairs"],
+  "recipe": "classify the current tone against the closed set -> rewrite (the agent's work) -> classify again - the label must move -> store both versions as the evidence",
+  "pitfalls": ["classify answers verbatim or errors - the tone set is closed", "the rewrite is the agent's; a tool that rewrites would be a drafting tool, and there is none by design", "a label that did not move means the pass failed - do not ship the rewrite"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

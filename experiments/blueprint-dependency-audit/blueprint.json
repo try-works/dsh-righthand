@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/dependency-audit",
+  "kind": "blueprint",
+  "description": "Dependency vulnerabilities as receipts: run the audit, receipt exit + tail, notify once on high severity, re-audit after the fix",
+  "hermes_source": "Security",
+  "ingredients": ["rh_run pnpm/npm audit", "rh_store audit:<repo>:<ts> receipts", "rh_notify_send on high severity + alert-once", "the fix loop + re-audit"],
+  "recipe": "run the audit (exit code is the verdict) -> receipt the result -> high severity: notify once -> fix, re-audit, receipt again",
+  "pitfalls": ["audit exit codes are the verdict - warnings that exit 0 are green", "alert-once record dedupes the notify", "the fix loop reruns only the audit"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

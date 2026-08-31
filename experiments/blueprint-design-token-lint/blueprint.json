@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/design-token-lint",
+  "kind": "blueprint",
+  "description": "Token spec validation as a gate step: run the validator, receipt the verdict, red blocks the design change, the fix loop reruns only it",
+  "hermes_source": "design-md",
+  "ingredients": ["rh_run the token validator script", "rh_store lint:<spec> receipts", "pre-commit-gate integration", "the fix loop"],
+  "recipe": "run the validator over the token spec -> receipt the verdict (exit + tail) -> red blocks the change - the fix loop reruns only the validator -> green: the gate passes",
+  "pitfalls": ["the validator is a local script - its exit code is the verdict", "warnings that exit 0 are green, whatever they say", "a red receipt is why the design change did not ship"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

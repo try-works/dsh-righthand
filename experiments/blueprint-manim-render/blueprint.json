@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/manim-render",
+  "kind": "blueprint",
+  "description": "Math animation renders as a share pipeline: rh_run renders the scene, R2 stores the video, the presigned link ships it",
+  "hermes_source": "manim-video",
+  "ingredients": ["rh_run manim", "rh_files_put the mp4", "rh_store render:<scene> index", "rh_files_share + rh_notify_send"],
+  "recipe": "render the scene (background + poll) -> exit 0 gates the put -> publish, index, share -> notify the link",
+  "pitfalls": ["manim renders are slow - background, never foreground", "the scene source is the source of truth - keep it beside the render receipt", "the presigned link expires"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

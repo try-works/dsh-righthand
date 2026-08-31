@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/job-tracker",
+  "kind": "blueprint",
+  "description": "Applications as a board with follow-up events: log the application, board a task, schedule the follow-up, record the outcome either way",
+  "hermes_source": "jobs / job-search",
+  "ingredients": ["rh_store app:<slug> records", "rh_task_create application tasks", "rh_events_create follow-up reminders", "rh_text_classify fit labels"],
+  "recipe": "log the application with the posting text -> classify fit (strong/medium/long-shot) -> board a task and schedule the follow-up event -> outcome: done or failed with the result field saying why",
+  "pitfalls": ["a rejected application is a failed task with a result - the record stays", "cancel the follow-up event when the outcome lands", "posting text in the record makes the fit check falsifiable"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

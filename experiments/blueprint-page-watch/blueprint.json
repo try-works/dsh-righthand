@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/page-watch",
+  "kind": "blueprint",
+  "description": "Watch a page for change: fetch through guardedFetch, hash the normalized body, alert once on change with the delta",
+  "hermes_source": "web-monitoring",
+  "ingredients": ["guardedFetch", "hash of the normalized body (computed by the agent)", "rh_store page:<slug>:<ts> { hash }", "rh_notify_send on change + alert-once"],
+  "recipe": "fetch the page -> normalize (strip volatile bits) and hash -> compare with the previous hash -> on change: extract the delta, notify once, store the new hash",
+  "pitfalls": ["dynamic pages hash-change every run - normalize timestamps and tokens out first", "store the hash, not the full page - the delta is the story", "alert-once record dedupes the notify"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

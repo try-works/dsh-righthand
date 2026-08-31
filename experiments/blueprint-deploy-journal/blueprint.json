@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/deploy-journal",
+  "kind": "blueprint",
+  "description": "Deploys with a paper trail: before-receipt, the deploy command, smoke checks, after-receipt, and a revert path from the undo trail",
+  "hermes_source": "DevOps",
+  "ingredients": ["rh_run deploy + smoke commands", "rh_store deploy:<id> before/after receipts", "heartbeat-style smoke checks", "undo trail for revert"],
+  "recipe": "write the before-receipt (what will change) -> deploy via rh_run -> smoke-check with the same command -> after-receipt; red smokes revert from the undo trail",
+  "pitfalls": ["undo quality equals receipt quality (governed-exec)", "smoke with the SAME command (debug-loop)", "a red smoke is a deploy to revert, not a warning to ignore"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

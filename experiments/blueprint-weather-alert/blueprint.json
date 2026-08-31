@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/weather-alert",
+  "kind": "blueprint",
+  "description": "Forecast thresholds become reminders: check the forecast, schedule an event at the crossing time, deliver through the reminder flow",
+  "hermes_source": "weather",
+  "ingredients": ["rh_weather_forecast", "rh_store thresholds (min/max/wind)", "rh_events_create at the crossing time", "rh_events_due + rh_notify_send"],
+  "recipe": "fetch the forecast -> compare against the stored thresholds -> on crossing: create an event at the forecast time -> the due check delivers it and marks it notified",
+  "pitfalls": ["forecasts change - re-check before the event fires", "absent fields are omitted, not null (weather schemas)", "the event is local time - mind the machine timezone"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

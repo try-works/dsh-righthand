@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/cli-ops",
+  "kind": "blueprint",
+  "description": "Any CLI operated safely: mutating subcommands behind guard ask, one receipt per invocation, verification with the same command",
+  "hermes_source": "antigravity-cli",
+  "ingredients": ["rh_run the CLI (argv only)", "guard ask on mutating subcommands", "rh_store ops:<tool>:<ts> receipts", "rh_run verify"],
+  "recipe": "identify the subcommand and its effect -> gate mutating subcommands behind ask -> run and receipt (exit + tail) -> verify with the same command",
+  "pitfalls": ["argv arrays only - no shell operators", "mutating subcommands carry ask, reads do not", "exit code is the verdict", "the receipt tail is the evidence, keep it short but real"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

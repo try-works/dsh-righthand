@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/translate-docs",
+  "kind": "blueprint",
+  "description": "Batch document translation: chunk on boundaries, translate per chunk, store the translations, reassemble and publish via files",
+  "hermes_source": "Translation",
+  "ingredients": ["rh_text_translate per chunk", "rh_store source:<doc>:<lang> translations", "rh_files_put reassembled artifacts", "rh_files_share delivery links"],
+  "recipe": "chunk the document on boundaries (translate preserves formatting) -> translate each chunk (one contained call) -> store chunk translations -> reassemble, publish, share",
+  "pitfalls": ["chunk before translating - one giant call fails the cap", "formatting is the translator's job (text family contract)", "a failed chunk fails clean - retry only that chunk", "the presigned link is a secret for its window"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/health-check-registry",
+  "kind": "blueprint",
+  "description": "Named checks as data: one store record per check (command + threshold), heartbeat runs the registry, streak failures alert once",
+  "hermes_source": "Networking",
+  "ingredients": ["rh_store check:<name> { argv, threshold }", "rh_run per registered check", "rh_store receipts per run", "rh_notify_send streak alerts + alert-once"],
+  "recipe": "register each check with its command and threshold -> run the registry -> receipt per check -> failure streak: notify once",
+  "pitfalls": ["the registry is data, not code - one record per check", "exit codes are the health signal, verbatim", "alert-once dedupes the streak notify"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/citation-graph",
+  "kind": "blueprint",
+  "description": "Claim trails linked into a queryable graph: extract triples, store nodes and source edges, traverse by prefix scan",
+  "hermes_source": "grounded-citations (extension)",
+  "ingredients": ["rh_text_extract claim/source/quote triples (citation-trail)", "rh_store graph:<docId> nodes and edges", "prefix scans as the query", "agent composes cited answers from the graph"],
+  "recipe": "extract claim triples -> store one node per claim and one edge per source -> dedupe claims by text -> compose answers by traversing the trails",
+  "pitfalls": ["the graph is prefix-scan only - a KV index is the documented escalation", "dedupe claims before storing edges", "the quote stays on every node (citation-trail invariant)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

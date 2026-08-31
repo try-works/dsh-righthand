@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/handoff-review",
+  "kind": "blueprint",
+  "description": "Review task handoffs before they count: collect done tasks, verify each outcome against evidence, accept or bounce, receipt the verdict",
+  "hermes_source": "sdlc-review",
+  "ingredients": ["rh_task_list done/failed", "rh_store handoff:<ts> review records", "evidence checks (receipts or rh_run)", "guard ask on accept"],
+  "recipe": "collect the done tasks -> verify each outcome against its evidence -> accept or bounce (with the reason on the task) -> receipt the review",
+  "pitfalls": ["a done task without evidence bounces back - the result field is the minimum", "the review receipt is the verdict, not an opinion", "bounced tasks stay open with the reason recorded"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

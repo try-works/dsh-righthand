@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/merge-arbiter",
+  "kind": "blueprint",
+  "description": "Neutral resolution of merge conflicts between two agents: capture the diff, extract both intents, propose a merge, verify with the gate",
+  "hermes_source": "agent-merge-conflict-arbiter",
+  "ingredients": ["rh_run git diff (the conflict)", "rh_text_extract side A / side B intents", "the agent proposes the resolution", "rh_run verify + pre-commit-gate"],
+  "recipe": "capture the conflict diff -> extract each side's intent and cite -> propose a resolution that honors both -> apply, verify with the same tests, gate the result",
+  "pitfalls": ["record both intents BEFORE proposing - the arbiter is neutral or it is nothing", "the cite on each intent keeps the resolution falsifiable", "verify with the same command that reproduced (debug-loop)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

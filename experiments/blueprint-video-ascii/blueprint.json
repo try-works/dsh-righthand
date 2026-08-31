@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/video-ascii",
+  "kind": "blueprint",
+  "description": "ASCII video rendering as a share pipeline: ffmpeg renders frames to ASCII, R2 stores the output, a presigned link ships it",
+  "hermes_source": "ascii-video",
+  "ingredients": ["rh_run ffmpeg pipeline", "rh_files_put the output", "rh_store render:<id> index", "rh_files_share + rh_notify_send"],
+  "recipe": "render the ASCII frames (background for long renders) -> exit 0 gates the put -> publish, index, share -> notify the link",
+  "pitfalls": ["long renders belong to rh_run_bg - status only, poll it", "exit 0 gates the put", "the presigned link is a secret for its window"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

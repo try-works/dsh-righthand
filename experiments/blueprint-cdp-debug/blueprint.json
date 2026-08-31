@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/cdp-debug",
+  "kind": "blueprint",
+  "description": "Debug a Node process over CDP without a PTY: start --inspect in the background, curl the CDP HTTP endpoints, capture, kill the job",
+  "hermes_source": "node-inspect-debugger",
+  "ingredients": ["rh_run_bg node --inspect", "rh_run curl the CDP HTTP endpoints (list, eval)", "rh_store debug session receipts", "job_kill when done"],
+  "recipe": "start the process with --inspect in the background -> curl the /json list to find the target -> drive the debugger over CDP HTTP -> capture findings, kill the job",
+  "pitfalls": ["background jobs report status only - the CDP port is the interface (live-verified)", "kill the job after - a stray inspector holds the port", "the session receipts record what was captured"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

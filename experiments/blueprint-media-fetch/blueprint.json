@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/media-fetch",
+  "kind": "blueprint",
+  "description": "Keyless media search and storage: Wikimedia Commons API supplies images without a key, R2 stores the binaries, the store indexes them, presigned links share them",
+  "hermes_source": "gif-search",
+  "ingredients": ["guardedFetch over the Wikimedia Commons API (keyless)", "rh_files_put binary objects", "rh_store media:<slug> index records", "rh_files_share presigned links"],
+  "recipe": "search Commons for the media -> fetch the file bytes -> put to R2 and index in the store -> share via a presigned link",
+  "pitfalls": ["Commons is keyless but rate-limited - probe and cache", "media is binary - files_put needs the right contentType", "the presigned URL is a secret for its window", "respect the source license - the index records attribution"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

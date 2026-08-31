@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/habit-tracker",
+  "kind": "blueprint",
+  "description": "Streaks with reminders: one store record per habit-day, a daily cue event, the due check delivers, a miss is a record not a failure",
+  "hermes_source": "fitness",
+  "ingredients": ["rh_store habit:<name>:<date> records", "rh_events_create daily cues", "rh_events_due + rh_notify_send delivery", "streak scan over the prefix"],
+  "recipe": "log the habit for today -> scan the streak (consecutive dates) -> schedule tomorrow's cue event -> due check delivers and marks notified - a missed day stays a gap in the record",
+  "pitfalls": ["a streak is consecutive dates - the scan, not a counter field", "a miss is a record (the gap), not an error", "due marks notified at return time - exactly-once is the state flip", "events are local time"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/fx-ledger",
+  "kind": "blueprint",
+  "description": "Multi-currency expense ledger over keyless rates: frankfurter.app supplies daily ECB rates, the budget-guard scan sums, the store converts",
+  "hermes_source": "Business & Finance",
+  "ingredients": ["guardedFetch over frankfurter.app (keyless ECB rates)", "rh_store rate:<date> records", "expense:<ts> records from budget-guard", "scan-and-sum conversion"],
+  "recipe": "fetch the daily rate -> store rate:<date> -> sum expenses per currency by prefix scan -> convert to the base currency and store the converted total",
+  "pitfalls": ["rates are dated - store the date with the rate", "the scan-and-sum is the query (budget-guard learnings)", "frankfurter is keyless but probe it first", "the cap stays in the store, not settings (schema wall)"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

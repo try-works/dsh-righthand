@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/skill-authoring",
+  "kind": "blueprint",
+  "description": "Author a packaged dsh skill: frontmatter drives catalog search, the body is the reference, registration is ctx.skills, shipping is the plugin release",
+  "hermes_source": "hermes-agent-skill-authoring",
+  "ingredients": ["skills/<name>/SKILL.md (the packaged-skill standard)", "ctx.skills.register with a directory resourceBase", "receipts + pre-commit-gate", "npm publish + profile install"],
+  "recipe": "write the frontmatter (name + description first - it drives search) -> write the body as a reference, not a tutorial -> register via ctx.skills on mount -> gate, ship, install",
+  "pitfalls": ["the description is what the catalog matches - write it for search", "the body is a reference: tool tables, semantics, limits", "a skill that restates tools without guidance is noise"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

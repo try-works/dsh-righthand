@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/video-digest",
+  "kind": "blueprint",
+  "description": "Video transcripts become digests: yt-dlp pulls subtitles locally, rh_text_summarise condenses chunk by chunk, the store keeps the digest",
+  "hermes_source": "youtube-content",
+  "ingredients": ["rh_run yt-dlp (local, keyless, quiet flags)", "rh_text_summarise per chunk", "rh_store video:<id> digest records", "rh_notify_send on completion"],
+  "recipe": "fetch subtitles via yt-dlp in collect mode -> chunk the transcript on paragraph boundaries -> summarise each chunk (one contained call) -> store the digest and notify once",
+  "pitfalls": ["subtitles may not exist - a red receipt records it, the digest says so", "collect mode bounds output - keep yt-dlp quiet", "chunk before summarise; one giant transcript fails the cap", "the video is the source of truth - the digest cites it"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

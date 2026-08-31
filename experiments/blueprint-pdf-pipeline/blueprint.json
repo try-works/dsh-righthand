@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/pdf-pipeline",
+  "kind": "blueprint",
+  "description": "PDF operations as receipts: extract text, OCR scans, merge or fill via CLI, publish the result, keep one receipt per step",
+  "hermes_source": "pdf",
+  "ingredients": ["rh_run pdftotext / OCR CLIs", "rh_text_extract fields", "rh_files_put outputs", "rh_store pdf:<slug> receipts"],
+  "recipe": "extract text (or OCR when the page is a scan) -> extract the structured fields -> merge/fill via CLI -> publish and receipt",
+  "pitfalls": ["scanned PDFs need OCR first - a red receipt marks it", "keep tails short - the text is the deliverable, not the log", "a failed extraction fails clean - do not half-parse"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

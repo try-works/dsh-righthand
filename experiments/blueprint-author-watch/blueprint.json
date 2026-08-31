@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/author-watch",
+  "kind": "blueprint",
+  "description": "Follow an author's new papers: query the keyless arXiv API, diff by id, summarise the new ones, store the window",
+  "hermes_source": "arxiv (variant)",
+  "ingredients": ["arXiv Atom adapter (paper-digest recipe, live-probed keyless)", "rh_store author window", "rh_text_summarise new abstracts", "rh_notify_send"],
+  "recipe": "query arXiv by author (plus a category filter when names collide) -> diff the window by arxiv id -> summarise only the new papers -> store + notify once",
+  "pitfalls": ["author names are ambiguous - pair with a category or affiliation filter", "diff by arxiv id, never by title (titles get revised)", "summarise new papers only - never re-digest the window"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

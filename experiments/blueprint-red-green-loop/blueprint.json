@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/red-green-loop",
+  "kind": "blueprint",
+  "description": "TDD enforced by receipts: the failing test runs first (red receipt), the fix runs the same command to green, refactor re-runs it again",
+  "hermes_source": "test-driven-development",
+  "ingredients": ["rh_run the test command", "rh_store tdd:<case> red/green receipts", "the same command every run", "pre-commit-gate as the outer ring"],
+  "recipe": "write the failing test -> run it - the red receipt is required before any fix -> fix until the same command is green -> refactor and re-run, then the gate",
+  "pitfalls": ["the red receipt is required - no red, no fix", "verify with the SAME command that reproduced", "exit code is the verdict, warnings notwithstanding"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/transit-status",
+  "kind": "blueprint",
+  "description": "Transit status as heartbeats: keyless status feeds per operator, one receipt per line, delay thresholds alert once",
+  "hermes_source": "transit",
+  "ingredients": ["guardedFetch keyless GTFS/RSS status feeds", "rh_store status:<line>:<ts> receipts", "thresholds per line", "rh_notify_send + alert-once"],
+  "recipe": "fetch the operator's status feed -> normalize per line -> store receipts -> threshold crossing: notify once",
+  "pitfalls": ["feeds vary per operator - probe each one first", "delays are thresholded - a 2-minute delay is not an alert", "a feed that dies is itself a heartbeat failure"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

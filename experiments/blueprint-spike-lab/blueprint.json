@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/spike-lab",
+  "kind": "blueprint",
+  "description": "Throwaway experiments with a verdict: run the spike, receipt the evidence, record the keep-or-throw decision, clean up after",
+  "hermes_source": "spike",
+  "ingredients": ["rh_run the experiment", "rh_store spike:<id> evidence receipts", "a decision record (keep/throw + why)", "cleanup deletes the throwaway keys"],
+  "recipe": "name the spike and state the question -> run the experiment -> receipt the evidence -> decide keep-or-throw with the reason, then clean up",
+  "pitfalls": ["a spike is for evidence, not product - throw it away after the decision", "the decision record is the deliverable, not the code", "cleanup discipline from the scenario runs"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

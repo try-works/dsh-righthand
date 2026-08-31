@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/gh-flow",
+  "kind": "blueprint",
+  "description": "The issue-to-merge path as receipts: gh CLI steps through rh_run, one receipt per step, guard ask on push, the pre-commit gate reviews the diff",
+  "hermes_source": "github",
+  "ingredients": ["rh_run gh (auth in the user's local gh config)", "rh_store gh:<issue> step receipts", "guard ask on the push step", "pre-commit-gate on the PR diff"],
+  "recipe": "open the issue and branch -> commit (gate receipts from pre-commit-gate) -> push behind the guard -> open the PR, review the diff, merge with a receipt",
+  "pitfalls": ["gh auth is the user's local config - nothing keyed enters the plugin", "receipts per step make a failed flow auditable", "the gate reviews the DIFF, not the run output"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

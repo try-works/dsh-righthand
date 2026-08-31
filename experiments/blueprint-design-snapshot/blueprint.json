@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/design-snapshot",
+  "kind": "blueprint",
+  "description": "Capture a site's design tokens as data: browse it, extract colors/type/spacing, store the snapshot, generate a reference artifact and publish it",
+  "hermes_source": "claude-design / popular-web-designs",
+  "ingredients": ["harness browser tools for the capture", "rh_store token:<site>:<ts> snapshots", "rh_files_put the reference artifact", "rh_files_share + rh_notify_send"],
+  "recipe": "browse the site and extract tokens -> store the dated snapshot -> generate the reference artifact (agent-built) -> publish and share",
+  "pitfalls": ["the snapshot is dated - re-snap on redesign", "tokens are facts, the artifact is a view - store both", "the dsh-versatile-design skill covers the craft; this kit is the capture pipeline"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}

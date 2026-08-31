@@ -1,0 +1,11 @@
+{
+  "name": "blueprint/audio-analysis",
+  "kind": "blueprint",
+  "description": "Audio metrics as receipts: ffmpeg/librosa scripts compute duration, loudness and tempo, the store keeps one receipt per track, the note summarizes",
+  "hermes_source": "songsee",
+  "ingredients": ["rh_run ffmpeg / librosa scripts", "rh_store audio:<id> metric receipts", "rh_text_summarise the note", "prefix scans as the library"],
+  "recipe": "compute the metrics (print numbers only - collect is bounded) -> receipt per track -> summarize the library note -> scan by prefix for the catalog",
+  "pitfalls": ["print metrics only - full spectrogram dumps blow the collect cap", "a missing tool is a red receipt, not a guessed number", "one receipt per track keeps the library diffable"],
+  "related": ["rh_store_*"],
+  "template": { "spec": "blueprint.json", "recipe": "README.md", "learnings": "LEARNINGS.md" }
+}
