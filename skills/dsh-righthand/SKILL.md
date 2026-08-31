@@ -29,6 +29,8 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 - One domain `righthand_store`: a `rows` table (string key → JSON value + timestamp) and a global write counter.
 - `rh_store_get` returns `{ found, key, value?, updatedAt? }` — `found: false` means the key is absent, not an error.
 - Writes are durable (backend flush before commit) and serialized on one write chain; values must be JSON-serializable.
+- The key prefix IS the collection (`task:`, `digest:`, `run:`, `uptime:`, `deploy:`); `rh_store_list` + a prefix filter is the query language. See `docs/scenario-patterns.md` for the conventions, the receipt pattern and undo trails.
+- Build, then keep one receipt key per run (`{ ...result, fetchedAt }`) — the store is the agent's durable trail; delete scenario keys when a run is only a test.
 
 ## Events semantics
 
@@ -91,6 +93,8 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 | `defaultZone` | `""` | default Cloudflare zone |
 | `defaultR2Bucket` | `""` | default R2 bucket for `rh_files_*` |
 | `defaultNotifyTopic` | `""` | default ntfy topic for `rh_notify_send` |
+
+Schema wall: `rh_settings_set` accepts keys the schema does not define, but `rh_settings_get` never returns them — an unregistered key looks written and silently disappears. Register new keys in the schema (a plugin change) or keep ad-hoc knobs in `rh_store`.
 
 ## Guard policy
 

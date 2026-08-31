@@ -75,7 +75,10 @@ Namespace "righthand" (registered by the secrets family):
 | `defaultNotifyTopic` | "" | default ntfy topic for `rh_notify_send` |
 
 `rh_settings_get` returns the resolved values; `rh_settings_set` merges a
-partial patch (persisted by the harness settings provider).
+partial patch (persisted by the harness settings provider). Schema wall:
+updates with keys the schema does not define are accepted but never come
+back from `rh_settings_get` — register new keys in the plugin schema, or
+keep ad-hoc knobs in `rh_store`.
 
 ## Blueprints
 
@@ -89,7 +92,7 @@ canonical example of the current DSH-native form (tool-to-tool via
 | Blueprint | What it builds |
 |---|---|
 | `blueprint/daily-digest` | Collect sources, summarize, send on a schedule — extractive locally, LLM synthesis as escalation |
-| `blueprint/data-adapter` | Wrap one keyless public API as a tool family: guarded fetch, normalize, one tool per query. Worked example ships in the plugin: `rh_weather_*` |
+| `blueprint/data-adapter` | Wrap one keyless public API as a tool family: guarded fetch, normalize, one tool per query. Worked examples ship in the plugin: `rh_weather_*`, `rh_places_*` |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |
 | `blueprint/research-radar` | Multi-source research over a rolling window (Reddit, X, YouTube, HN, Polymarket, web): score, dedupe, synthesize with citations |
 | `blueprint/web-scraper` | Fetch a page, extract title/headings/links/text, make it searchable — static HTML first, render/vision as escalation |
@@ -107,6 +110,12 @@ families worth adding, from the tools catalogue + permission commit) and
 [`docs/mu-repo-analysis.md`](docs/mu-repo-analysis.md) (architecture lessons
 from the whole repo — single-source specs, golden permissions, layering,
 held-state gates, SSRF guarding).
+
+[`docs/scenario-patterns.md`](docs/scenario-patterns.md) is the guidance
+built by actually running the tools: key-prefix conventions, the receipt
+pattern, undo trails, the settings schema wall, credential auth gates, and
+exec collect-vs-background — each pattern live-verified against the real
+harness services.
 
 ## Packaged skill
 
