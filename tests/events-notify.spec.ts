@@ -58,8 +58,31 @@ describe('freeSlots (pure, local-time working hours)', () => {
     const now = new Date(2026, 7, 31, 11, 0)
     const at = new Date(2026, 7, 31, 12, 0).toISOString()
     const busy: Event[] = [{ id: 'e1', title: 'a', detail: '', at, state: 'pending', createdAt: '' }]
-    expect(freeSlots(busy, now, 120, 24)).toEqual([])
-    expect(freeSlots(busy, now, 30, 24).length).toBeGreaterThan(0)
+    // 120 min does not fit before the 12:00 event, but the afternoon after
+    // it is free - the trailing gap is a slot (live-caught bug fix).
+    expect(freeSlots(busy, now, 120, 24)).toEqual([
+      new Date(2026, 7, 31, 12, 0).toISOString(),
+      new Date(2026, 8, 1, 9, 0).toISOString(),
+    ])
+    expect(freeSlots(busy, now, 30, 24)[0]).toBe(new Date(2026, 7, 31, 11, 0).toISOString())
+  })
+
+  it('an empty calendar yields slots (live-caught: returned [] before the fix)', () => {
+    const now = new Date(2026, 7, 31, 10, 0)
+    const slots = freeSlots([], now, 60, 24)
+    expect(slots).toEqual([
+      new Date(2026, 7, 31, 10, 0).toISOString(),
+      new Date(2026, 8, 1, 9, 0).toISOString(),
+    ])
+  })
+
+  it('the gap after the last event of a day is free time', () => {
+    const now = new Date(2026, 7, 31, 9, 0)
+    const at = new Date(2026, 7, 31, 10, 0).toISOString()
+    const busy: Event[] = [{ id: 'e1', title: 'a', detail: '', at, state: 'pending', createdAt: '' }]
+    const slots = freeSlots(busy, now, 60, 24)
+    expect(slots[0]).toBe(new Date(2026, 7, 31, 9, 0).toISOString())
+    expect(slots[1]).toBe(new Date(2026, 7, 31, 10, 0).toISOString())
   })
 })
 

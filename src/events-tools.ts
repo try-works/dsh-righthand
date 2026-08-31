@@ -60,7 +60,7 @@ export function freeSlots(events: readonly Event[], now: Date, durationMinutes: 
     .filter(t => Number.isFinite(t) && t >= now.getTime() && t <= horizonEnd)
     .sort((a, b) => a - b)
   const slots: string[] = []
-  let cursor = now.getTime()
+  const need = durationMinutes * 60000
   const dayStart = (t: number): number => {
     const d = new Date(t)
     d.setHours(9, 0, 0, 0)
@@ -71,14 +71,23 @@ export function freeSlots(events: readonly Event[], now: Date, durationMinutes: 
     d.setHours(17, 0, 0, 0)
     return d.getTime()
   }
-  const need = durationMinutes * 60000
-  for (const b of busy) {
-    let from = Math.max(cursor, dayStart(cursor))
-    if (from < b && b - from >= need && from + need <= dayEnd(from) && from + need <= horizonEnd) {
-      slots.push(new Date(from).toISOString())
+  // Scan each working day in the horizon. A slot is any gap of at least
+  // `need` between blockers (pending events and the end of the day).
+  // An empty calendar is the common case: it must yield slots, and the
+  // gap after the last event of a day is free time too.
+  for (let day = dayStart(now.getTime()); day <= horizonEnd; day += 86400000) {
+    const wStart = day
+    const wEnd = dayEnd(day)
+    if (wEnd <= now.getTime()) continue
+    let cursor = Math.max(wStart, now.getTime())
+    const to = Math.min(wEnd, horizonEnd)
+    const blockers = busy.filter(t => t > cursor && t < to)
+    for (const b of [...blockers, to]) {
+      if (b - cursor >= need) {
+        slots.push(new Date(cursor).toISOString())
+      }
+      cursor = Math.max(cursor, b)
     }
-    cursor = Math.max(b, dayEnd(cursor) + 1)
-    if (cursor > horizonEnd) break
   }
   return slots
 }

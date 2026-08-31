@@ -16,3 +16,9 @@
 4. **One-off events only.** Recurring reminders are create-again-on-
    fire; a real scheduler (Cloudflare cron) is the documented
    escalation, not a built primitive.
+5. **Empty calendars must yield slots (live-caught 2026-08-31).** The
+   first live rh_events_free call after the restart returned [] with
+   nothing booked: the slot loop only ran over busy events, so an empty
+   calendar and the gap after the last event of a day were never
+   reported. Fixed in 0.1.17 - freeSlots now scans each working day and
+   reports every gap, including the trailing one.
