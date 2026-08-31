@@ -36,7 +36,7 @@ The righthand toolkit: DSH-native tools over the harness's own services. Use thi
 
 - One domain `righthand_events`; states `pending` → `notified` (or `cancelled`).
 - `rh_events_due` is the per-turn check: pending events with `at <= now` are returned once and marked notified, so a missed turn leaves a visible record, never silence.
-- `rh_events_free` works in local time, working hours 09:00–17:00; durations are in minutes.
+- `rh_events_free` works in local time, working hours 09:00–17:00; durations are in minutes. Empty calendars yield slots, and the gap after the last event of a day is free time too (0.1.17 fix, live-caught).
 - One-off events only; a real scheduler (Cloudflare cron) is the documented escalation.
 
 ## Notify semantics
@@ -109,4 +109,46 @@ Rules come from the plugin config (`rules: [{ toolPrefix, mode, ask?, destructiv
 
 ## Composition blueprints
 
-Repo guidance kits under `experiments/` (each a `blueprint.json` spec + recipe + learnings) for composing the tools into routines. Committed kits: `blueprint/daily-digest` (collect → summarize → send), `blueprint/data-adapter` (wrap a keyless API; worked examples `rh_weather_*` / `rh_places_*`), `blueprint/reminder-flow` (events + notify + receipts), `blueprint/geo-context` (places + weather + store cache), `blueprint/governed-exec` (guard + receipts + undo trails), `blueprint/file-vault` (R2 + store index + presigned shares), `blueprint/task-triage` (classify + extract + board, oldest-open loop), `blueprint/heartbeat` (checks + receipts + streak alerts), `blueprint/agent-notebook` (note:<slug> memory + compaction), `blueprint/credential-onboarding` (auth gates + account facts + receipt), `blueprint/budget-guard` (categorized expenses + store-held cap + warn-once), `blueprint/price-watch` (adapter fetch + extract + history + crossing alerts), `blueprint/document-action-plan` (extract obligations -> tasks + deadline reminders), `blueprint/weekly-review` (receipts -> synthesis -> chained plan), `blueprint/pre-commit-gate` (check chain + receipts + guard-held ship), `blueprint/blocked-page-recovery` (the 403/429/paywall ladder), `blueprint/paper-digest` (keyless arXiv digest), `blueprint/company-watch` (material-news monitor), `blueprint/citation-trail` (claim/source/quote triples), `blueprint/inbox-triage` (priority labels + follow-ups), `blueprint/codebase-audit` (metric snapshots), `blueprint/dogfood-session` (evidence-led QA), `blueprint/debug-loop` (reproduce/evidence/hypothesize/verify), `blueprint/artifact-publish` (render -> R2 -> presigned link), `blueprint/delegate-cli-coder` (brief + gate + diff review), plus a 50-kit expansion mined from the Hermes agent skills hub (hermes-agent.nousresearch.com) covering routes/ETA, video and paper digests, topic radar, market signals, open-data snapshots, page watches, FX ledgers, weather alerts, mail flow, vaults, habits, meals, jobs, trips, drafts, translation, linked notes, device pings, gh flow, TDD loops, spikes, parallel cleanup, CDP debugging, merge arbitration, CLI ops, token linting, skill authoring, handoff reviews, media fetch, image/audio/video pipelines, design snapshots, office docs, PDFs, spreadsheets, decks, invoices, deploy journals, env audits, dependency audits, secret sweeps, style passes, health-check registries, RSS mirrors, transit status and browser session logs. The README catalogues nine more for future builds; `docs/scenario-patterns.md` holds the live-tested recipes.
+Seventy-five committed blueprint kits under `experiments/` (each a
+`blueprint.json` spec + recipe + learnings) compose the tools into
+routines. The README blueprint table is the full catalogue: 84 named
+recipes, nine more catalogued for future builds. `docs/scenario-patterns.md`
+holds the live-tested recipes.
+
+Core kits: `blueprint/daily-digest` (collect -> summarize -> send),
+`blueprint/data-adapter` (wrap a keyless API; worked examples `rh_weather_*`
+/ `rh_places_*`), `blueprint/reminder-flow` (events + notify + receipts),
+`blueprint/geo-context` (places + weather + store cache),
+`blueprint/governed-exec` (guard + receipts + undo trails),
+`blueprint/file-vault` (R2 + store index + presigned shares),
+`blueprint/task-triage` (classify + extract + board), `blueprint/heartbeat`
+(checks + receipts + streak alerts), `blueprint/agent-notebook` (note:<slug>
+memory + compaction), `blueprint/credential-onboarding` (auth gates +
+account facts + receipt), `blueprint/budget-guard` (expenses + store-held
+cap + warn-once).
+
+Fourteen more mapped from the Hermes agent skills hub
+(hermes-agent.nousresearch.com): price-watch, document-action-plan,
+weekly-review, pre-commit-gate, blocked-page-recovery, paper-digest,
+company-watch, citation-trail, inbox-triage, codebase-audit,
+dogfood-session, debug-loop, artifact-publish, delegate-cli-coder. A
+further fifty from the same hub cover routes/ETA, video digests, topic
+radar, market signals, open-data snapshots, page watches, FX ledgers,
+weather alerts, mail flow, vaults, habits, meals, jobs, trips, drafts,
+translation, linked notes, device pings, gh flow, TDD loops, spikes,
+parallel cleanup, CDP debugging, merge arbitration, CLI ops, token
+linting, skill authoring, handoff reviews, media/image/audio/video
+pipelines, design snapshots, office docs, PDFs, spreadsheets, decks,
+invoices, deploy journals, env audits, dependency audits, secret sweeps,
+style passes, health-check registries, RSS mirrors, transit status and
+browser session logs.
+
+Cloud-tested builds (deployed Workers on the user's own account, each
+with `cloud/index.js` + `cloud/wrangler.jsonc` + `cloud/LEARNINGS.md`):
+paper-digest -> rh-arxiv.ambiens.workers.dev, open-data-snapshot ->
+rh-quakes.ambiens.workers.dev, rss-social-mirror ->
+rh-rss-ladder.ambiens.workers.dev, weather-alert ->
+rh-weather-alert.ambiens.workers.dev (cron `0 8 * * *`), page-watch ->
+rh-page-watch.ambiens.workers.dev. Template invariant: remote normalize,
+local remember - Workers stay stateless, windows and diffs live in
+`rh_store`.
