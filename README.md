@@ -107,7 +107,7 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/weekly-review` | The weekly reset: scan done/failed tasks, delivered events and receipts, synthesize, store a chained next-week plan (Hermes weekly-review-planning) |
 | `blueprint/pre-commit-gate` | Every change ships through the same gate: lint/typecheck/test/secret-scan via `rh_run`, one receipt per check, guard holds the ship step (Hermes requesting-code-review) |
 | `blueprint/blocked-page-recovery` | The escalation ladder when a fetch fails — backoff, browser UA, header fixes, alternate endpoint, browser tools, clean give-up (Hermes blocked-page-recovery) |
-| `blueprint/paper-digest` | Keyless arXiv digest: Atom API adapter (live-probed), abstract summarising, rolling store window, diff-by-id (Hermes arxiv) |
+| `blueprint/paper-digest` | Keyless arXiv digest: Atom API adapter (live-probed), abstract summarising, rolling store window, diff-by-id (Hermes arxiv) — **cloud-tested**: rh-arxiv.ambiens.workers.dev |
 | `blueprint/company-watch` | Watch named companies for material news: keyless sources, extracted mention triples, rolling window, alert on new claims only (Hermes competitor-news-monitor) |
 | `blueprint/citation-trail` | Every claim carries its source: extract claim/source/quote triples, store the trail, assert only trailed claims (Hermes grounded-citations) |
 | `blueprint/inbox-triage` | Triage any inbox: closed priority labels, extracted asks, follow-up tasks + deadline events, ignore recorded too (Hermes email-inbox-triage) |
@@ -121,10 +121,10 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/topic-radar` | Many keyless feeds on one topic: extract mentions, dedupe by url, digest (Hermes news) |
 | `blueprint/author-watch` | Follow an author's new arXiv papers, diff by id, summarise only the new (Hermes arxiv) |
 | `blueprint/market-signals` | Keyless prediction-market odds history + threshold crossing alerts (Hermes prediction-markets) |
-| `blueprint/open-data-snapshot` | Keyless civic datasets as diffable snapshots with a change note (Hermes open-data) |
-| `blueprint/page-watch` | Hash-diff a page each run, alert once on change with the delta (Hermes web-monitoring) |
+| `blueprint/open-data-snapshot` | Keyless civic datasets as diffable snapshots with a change note (Hermes open-data) — **cloud-tested**: rh-quakes.ambiens.workers.dev |
+| `blueprint/page-watch` | Hash-diff a page each run, alert once on change with the delta (Hermes web-monitoring) — **cloud-tested**: rh-page-watch.ambiens.workers.dev |
 | `blueprint/fx-ledger` | Keyless ECB rates via frankfurter + budget-guard scan-and-sum conversion (Hermes finance) |
-| `blueprint/weather-alert` | Forecast thresholds become reminder events at the crossing time (Hermes weather) |
+| `blueprint/weather-alert` | Forecast thresholds become reminder events at the crossing time (Hermes weather) — **cloud-tested**: rh-weather-alert.ambiens.workers.dev |
 | `blueprint/citation-graph` | Claim trails linked into a queryable graph, prefix-scan traversal (Hermes grounded-citations) |
 | `blueprint/mail-flow` | Local himalaya CLI mail + the inbox-triage pattern, credentials never in the plugin (Hermes himalaya) |
 | `blueprint/obsidian-vault` | The notebook pattern over a real vault: scan, index, recall, compact (Hermes obsidian) |
@@ -163,7 +163,7 @@ canonical example of the current DSH-native form (tool-to-tool via
 | `blueprint/secret-sweep` | Periodic secret scans as receipts, a hit blocks the gate (Hermes Security) |
 | `blueprint/style-pass` | Verified tone shifts: classify, rewrite, re-classify, store the pair (Hermes humanizer) |
 | `blueprint/health-check-registry` | Named checks as store data run by the heartbeat (Hermes Networking) |
-| `blueprint/rss-social-mirror` | Keyless social monitoring via RSS with the 403 ladder (Hermes Social Media) |
+| `blueprint/rss-social-mirror` | Keyless social monitoring via RSS with the 403 ladder (Hermes Social Media) — **cloud-tested**: rh-rss-ladder.ambiens.workers.dev |
 | `blueprint/transit-status` | Keyless status feeds as per-line heartbeats (Hermes transit) |
 | `blueprint/browser-session-log` | Browsing evidence receipts feeding the weekly review (Hermes browser) |
 | (phase 5) `rh_files_*` on R2 | The first family on an actual Cloudflare primitive: S3-compatible API, SigV4 signing pinned to the AWS test vector, credentials from the credential provider |

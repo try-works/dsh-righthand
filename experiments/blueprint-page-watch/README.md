@@ -24,3 +24,13 @@ Watch a page for change: fetch through guardedFetch, hash the normalized body, a
 ## Limits
 
 javascript-rendered pages need the browser tools instead of a plain fetch.
+
+## Cloud build
+
+Deployed test Worker on the user's own Cloudflare account (workers.dev,
+keyless): https://rh-page-watch.ambiens.workers.dev - `cloud/index.js` + `cloud/wrangler.jsonc`,
+tested by `cloud/test.ts`, evidence in `cloud/evidence.json`,
+learnings in `cloud/LEARNINGS.md`.
+
+- Measured 2026-08-31: two /watch runs produced the same SHA-256 (461395b5...), 399 bytes, PASS - the fingerprint is stable.
+- Template split: remote fingerprint, local diff - the previous hash and the alert live in the caller's rh_store.

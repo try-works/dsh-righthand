@@ -24,3 +24,13 @@ Forecast thresholds become reminders: check the forecast, schedule an event at t
 ## Limits
 
 forecast accuracy is the ceiling - alerts are only as good as the model.
+
+## Cloud build
+
+Deployed test Worker on the user's own Cloudflare account (workers.dev,
+keyless): https://rh-weather-alert.ambiens.workers.dev - `cloud/index.js` + `cloud/wrangler.jsonc`,
+tested by `cloud/test.ts`, evidence in `cloud/evidence.json`,
+learnings in `cloud/LEARNINGS.md`.
+
+- Measured 2026-08-31: /check returned 1 crossing (wind 15.8 vs 0), timezone GMT; cron trigger '0 8 * * *' deployed.
+- Boundary measured: the Worker computes crossings; delivery stays the agent's rh_events_due + rh_notify_send (exactly-once needs the store).

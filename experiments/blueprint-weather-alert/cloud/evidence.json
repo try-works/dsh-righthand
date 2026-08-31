@@ -1,0 +1,11 @@
+{
+  "deployed": true,
+  "url": "https://rh-weather-alert.ambiens.workers.dev",
+  "run": {
+    "endpoint": "/check?lat=51.5007&lon=-0.1246&tmin=-99&tmax=99&wmax=0",
+    "timezone": "GMT",
+    "crossings": 1,
+    "detail": "wind 15.8 km/h vs threshold 0 (test thresholds forced the crossing)"
+  },
+  "finding": "Open-Meteo answers from CF egress; threshold crossing detection works; cron trigger '0 8 * * *' deployed - the scheduled handler computes crossings and logs, delivery stays the agent's events + notify."
+}

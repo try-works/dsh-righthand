@@ -1,0 +1,12 @@
+{
+  "deployed": true,
+  "url": "https://rh-rss-ladder.ambiens.workers.dev",
+  "versionId": "e1827cb0-36c1-4260-9bdc-085493c0603e",
+  "run": {
+    "endpoint": "/feed?src=reddit | /feed?src=lobsters",
+    "reddit": 24,
+    "lobsters": 25,
+    "dedupeHeld": true
+  },
+  "finding": "Reddit's .rss now answers Atom (application/atom+xml, <entry> elements) - an <item>-only parser silently yields 0 items both locally and on CF egress. Parsing both shapes fixed it. Format drift, not egress blocking."
+}

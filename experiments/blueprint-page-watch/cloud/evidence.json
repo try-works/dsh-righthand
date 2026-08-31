@@ -1,0 +1,12 @@
+{
+  "deployed": true,
+  "url": "https://rh-page-watch.ambiens.workers.dev",
+  "run": {
+    "endpoint": "/watch?url=example (twice)",
+    "hash": "461395b5efe40dcd...",
+    "bytes": 399,
+    "title": "Example Domain",
+    "stableAcrossRuns": true
+  },
+  "finding": "WebCrypto SHA-256 works in Workers; normalization (strip script/style/comments, collapse whitespace) yields stable fingerprints across runs - the diff lives in the caller by design."
+}

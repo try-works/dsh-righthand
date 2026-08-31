@@ -25,3 +25,13 @@
 Query syntax: search_query=all:term, sortBy=submittedDate&sortOrder=
 descending. The redirect export.arxiv.org -> arxiv.org/api is a
 redirect hop guardedFetch revalidates.
+
+## Cloud build
+
+Deployed test Worker on the user's own Cloudflare account (workers.dev,
+keyless): https://rh-arxiv.ambiens.workers.dev - `cloud/index.js` + `cloud/wrangler.jsonc`,
+tested by `cloud/test.ts`, evidence in `cloud/evidence.json`,
+learnings in `cloud/LEARNINGS.md`.
+
+- Measured 2026-08-31: /papers?q=agent&n=5 -> 5 entries, unique arxiv ids, PASS - arXiv works from CF egress.
+- Template split: the Worker normalizes (fetch + Atom parse + JSON out); the rolling window and the diff stay in the caller's rh_store.

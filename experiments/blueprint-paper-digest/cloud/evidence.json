@@ -1,0 +1,15 @@
+{
+  "deployed": true,
+  "url": "https://rh-arxiv.ambiens.workers.dev",
+  "run": {
+    "endpoint": "/papers?q=agent&n=5",
+    "count": 5,
+    "top": [
+      "2608.28553v1 - Logos: An Agent Harness on a Cross-Process Bus",
+      "2608.28542v1 - Offline-Verifiable Accountability for Cross-Organization Agent Messaging",
+      "2608.28532v1 - xTRUCE: A Provably Safe Arbiter for Multi-xApp Conflict Mitigation"
+    ],
+    "idsUnique": true
+  },
+  "finding": "export.arxiv.org works from CF egress (follows the export->arxiv redirect); Atom entries parse to unique arxiv ids, so the caller can diff by id."
+}

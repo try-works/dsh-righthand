@@ -1,0 +1,15 @@
+{
+  "deployed": true,
+  "url": "https://rh-quakes.ambiens.workers.dev",
+  "run": {
+    "endpoint": "/snapshot?days=1&minmag=2.5",
+    "count": 43,
+    "top": [
+      "us7000td3c M4.6 - 28 km ESE of Kuril'sk, Russia",
+      "tx2026rcyegf M3.3 - 48 km W of Mentone, Texas",
+      "us7000td37 M2.7 - 186 km W of Bandon, Oregon"
+    ],
+    "idsMatchFeatures": true
+  },
+  "finding": "USGS GeoJSON answers from CF egress (43 events in 24h >= M2.5); stable event ids make the snapshot diffable - the ids array is the diff key."
+}

@@ -1,0 +1,13 @@
+{
+  "name": "rh-weather-alert",
+  "main": "index.js",
+  "compatibility_date": "2026-08-31",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "triggers": {
+    "crons": [
+      "0 8 * * *"
+    ]
+  }
+}
