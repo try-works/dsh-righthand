@@ -1,7 +1,7 @@
 {
   "name": "@try-works/dsh-righthand",
   "description": "DeepSeek Harness plugin: DSH-native righthand tools — durable KV store, credential/settings management, governed exec, and a tool guard",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,15 +10,20 @@
       "types": "./lib/index.d.ts",
       "default": "./lib/index.js"
     },
+    "./client": {
+      "types": "./lib/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
     "./src/*": "./src/*",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "bundle": "tsdown",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "prepack": "npm run build"
+    "prepack": "npm run build && npm run bundle"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
@@ -68,7 +73,16 @@
     "@deepseek-ai/dsh-code-runtime": "file:D:/deepseek-harness/packages/code-runtime/code-runtime",
     "@deepseek-ai/dsh-attachment": "file:D:/deepseek-harness/packages/attachment/attachment",
     "@deepseek-ai/dsh-commands": "file:D:/deepseek-harness/packages/interaction/commands",
-    "@deepseek-ai/dsh-skill": "file:D:/deepseek-harness/packages/skill/skill"
+    "@deepseek-ai/dsh-skill": "file:D:/deepseek-harness/packages/skill/skill",
+    "@deepseek-ai/dsh-host-webserver": "file:D:/deepseek-harness/packages/host/webserver",
+    "@deepseek-ai/dsh-client-runtime": "file:D:/deepseek-harness/packages/client/runtime",
+    "@deepseek-ai/dsh-client-ui-layout": "file:D:/deepseek-harness/packages/client/ui-layout",
+    "@deepseek-ai/dsh-client-ui-slots": "file:D:/deepseek-harness/packages/client/ui-slots",
+    "tsdown": "^0.22.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1"
   },
   "files": [
     "lib",
@@ -82,6 +96,13 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ],
+      "external": []
     }
   },
   "repository": {

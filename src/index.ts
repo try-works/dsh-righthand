@@ -25,6 +25,7 @@
  * - notify-tools:    rh_notify_send over ntfy.sh (keyless)
  * - exec-tools:      rh_run / rh_run_bg over ctx.subprocess + ctx.jobs
  * - guard-tools:     tools/pre-execute policy (config.rules)
+ * - gui:             /righthand/* web routes + the client panel (src/client)
  * - skills:          the packaged dsh-righthand skill (ctx.skills)
  *
  * @module @try-works/dsh-righthand
@@ -42,6 +43,7 @@ import * as placesTools from './places-tools.ts'
 import * as filesTools from './files-tools.ts'
 import * as eventsTools from './events-tools.ts'
 import * as notifyTools from './notify-tools.ts'
+import * as guiTools from './gui.ts'
 import * as righthandSkills from './skills.ts'
 import type { GuardRule } from './guard-tools.ts'
 
@@ -73,12 +75,13 @@ export function apply(ctx: Context, config: RighthandConfig = {}): void {
   ctx.plugin(filesTools)
   ctx.plugin(eventsTools)
   ctx.plugin(notifyTools)
+  ctx.plugin(guiTools)
   ctx.plugin(guardTools, { rules: config.rules ?? [] })
   ctx.plugin(righthandSkills)
 }
 
 // Individual modules stay importable for selective mounting.
-export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, placesTools, filesTools, eventsTools, notifyTools, guardTools, righthandSkills }
+export { storeTools, secretsTools, execTools, taskTools, textTools, weatherTools, placesTools, filesTools, eventsTools, notifyTools, guiTools, guardTools, righthandSkills }
 export { SKILL_NAME, SKILL_DESCRIPTION, skillDirectory, skillBody } from './skills.ts'
 export type { GuardRule } from './guard-tools.ts'
 export { guardFactsFor } from './guard-tools.ts'
