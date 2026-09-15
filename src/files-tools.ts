@@ -13,7 +13,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+// Type-only: declares `ctx.settings`.
+import type {} from '@deepseek-ai/dsh-settings'
 import { signRequest, presignGet } from './sigv4.ts'
 import { genCall, genResult } from './cards.ts'
 
@@ -143,7 +144,7 @@ export function createR2Client(opts: R2Options) {
 
 
 export function apply(ctx: Context, config: FilesConfig = {}): void {
-  const ns = settingsNamespace('righthand')
+  const ns = 'righthand'
 
   /** Resolve accountId + credentials + bucket at call time. */
   async function client(): Promise<ReturnType<typeof createR2Client>> {
@@ -299,7 +300,5 @@ export function apply(ctx: Context, config: FilesConfig = {}): void {
     },
   }))
 }
-
-
 
 

@@ -10,7 +10,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+// Type-only: declares `ctx.settings` (the settings provider seam).
+import type {} from '@deepseek-ai/dsh-settings'
 import { genCall, genResult } from './cards.ts'
 import z from '@deepseek-ai/schemastery'
 
@@ -34,7 +35,7 @@ export const righthandSettingsSchema = z.object({
 
 /** Register the settings namespace + the secret/credential tools. */
 export function apply(ctx: Context): void {
-  const ns = settingsNamespace('righthand')
+  const ns = 'righthand'
   // Register once; the settings provider merges schema defaults + user doc.
   const scope = ctx.settings.register(ns, righthandSettingsSchema)
 

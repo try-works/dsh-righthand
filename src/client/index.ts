@@ -12,8 +12,9 @@ import {
   type CSSProperties,
 } from 'react'
 import { createPortal } from 'react-dom'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
-import type {} from '@deepseek-ai/dsh-client-ui-slots'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+// Type-only: declares `ctx.slots` (the client kernel's slot registry).
+import type {} from '@deepseek-ai/dsh-cordis-client-runner/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 
 /** Required services: the slot registry (client runtime). */

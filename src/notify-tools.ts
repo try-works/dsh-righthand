@@ -8,7 +8,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+// Type-only: declares `ctx.settings`.
+import type {} from '@deepseek-ai/dsh-settings'
 import { guardedFetch } from './weather-tools.ts'
 import { genCall, genResult } from './cards.ts'
 
@@ -23,7 +24,7 @@ export interface NotifyConfig {
 }
 
 export function apply(ctx: Context, config: NotifyConfig = {}): void {
-  const ns = settingsNamespace('righthand')
+  const ns = 'righthand'
   const baseUrl = config.baseUrl ?? 'https://ntfy.sh'
 
   ctx.tools.register(defineTool({
@@ -62,4 +63,3 @@ export function apply(ctx: Context, config: NotifyConfig = {}): void {
     },
   }))
 }
-

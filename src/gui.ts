@@ -8,7 +8,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+// Type-only: declares `ctx.settings`.
+import type {} from '@deepseek-ai/dsh-settings'
 import { storeDomain } from './store-tools.ts'
 import { taskDomain } from './task-tools.ts'
 import { eventsDomain } from './events-tools.ts'
@@ -18,7 +19,7 @@ import type {} from '@deepseek-ai/dsh-host-webserver'
 export const name = 'righthand-gui'
 export const inject = ['webServer', 'storageDomain', 'settings']
 
-const ns = settingsNamespace('righthand')
+const ns = 'righthand'
 
 function json(res: ServerResponse, code: number, body: unknown): void {
   const text = JSON.stringify(body)

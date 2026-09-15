@@ -8,7 +8,6 @@ import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { credentialRef } from '@deepseek-ai/dsh-credentials'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
 import { filesTools, secretsTools, createR2Client, signRequest } from '../src/index.ts'
 
 const contexts: Context[] = []
@@ -106,7 +105,7 @@ describe('rh_files_* tools (booted, stubbed network)', () => {
     await ctx.plugin(secretsTools)
     await ctx.credentials.set(credentialRef('R2_ACCESS_KEY_ID'), 'AKID')
     await ctx.credentials.set(credentialRef('R2_SECRET_ACCESS_KEY'), 'SECRET')
-    await ctx.settings.update(settingsNamespace('righthand'), { accountId: 'acct123', defaultR2Bucket: 'bkt' })
+    await ctx.settings.update('righthand', { accountId: 'acct123', defaultR2Bucket: 'bkt' })
     await ctx.plugin(filesTools)
 
     const put = await call(ctx, 'rh_files_put', { key: 'notes/hello.txt', content: 'hello r2' })
